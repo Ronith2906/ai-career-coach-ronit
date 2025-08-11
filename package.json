@@ -1,0 +1,29 @@
+{
+  "name": "ai-career-coach",
+  "version": "1.0.0",
+  "description": "AI-powered career coaching application with resume optimization, interview prep, and career planning",
+  "main": "ai_career_coach_fixed.js",
+  "scripts": {
+    "start": "node ai_career_coach_fixed.js",
+    "dev": "node ai_career_coach_fixed.js"
+  },
+  "dependencies": {
+    "docx": "^8.5.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^3.3.2",
+    "pdf-parse": "^1.1.1"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": [
+    "ai",
+    "career",
+    "coaching",
+    "resume",
+    "interview",
+    "openai"
+  ],
+  "author": "AI Career Coach Team",
+  "license": "MIT"
+}
