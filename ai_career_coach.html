@@ -3413,7 +3413,13 @@
             return html;
         }
 
-
+        // Format job analytics data
+        function formatJobAnalytics(data) {
+            if (typeof data === 'string') {
+                return data.replace(/\n/g, '<br>');
+            }
+            
+            let html = '<div class="job-analytics">';
             
             // Market Overview
             if (data.marketOverview) {
@@ -3650,6 +3656,65 @@
                                     </div>
                                 </div>
                             `).join('') : '<p>Salary data not available</p>'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Job Opportunities
+            if (data.jobOpportunities) {
+                html += `
+                    <div class="analytics-section">
+                        <h4>🎯 Job Opportunities</h4>
+                        <div class="opportunities-grid">
+                            <div class="opportunity-card">
+                                <h5>📈 Market Demand</h5>
+                                <p class="demand-level ${data.jobOpportunities.marketDemand.toLowerCase()}">${data.jobOpportunities.marketDemand}</p>
+                            </div>
+                            
+                            <div class="opportunity-card">
+                                <h5>🏠 Remote Availability</h5>
+                                <p class="remote-availability ${data.jobOpportunities.remoteAvailability.toLowerCase()}">${data.jobOpportunities.remoteAvailability}</p>
+                            </div>
+                            
+                            <div class="opportunity-card">
+                                <h5>📊 Entry vs Senior Level</h5>
+                                <div class="level-comparison">
+                                    <p><strong>Entry Level:</strong> ${data.jobOpportunities.entryVsSenior.entryLevel}</p>
+                                    <p><strong>Senior Level:</strong> ${data.jobOpportunities.entryVsSenior.senior}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Career Advice
+            if (data.careerAdvice) {
+                html += `
+                    <div class="analytics-section">
+                        <h4>💡 Career Advice</h4>
+                        <div class="advice-grid">
+                            <div class="advice-category">
+                                <h5>🏆 Staying Competitive</h5>
+                                <ul>
+                                    ${data.careerAdvice.stayingCompetitive ? data.careerAdvice.stayingCompetitive.map(advice => `<li>${advice}</li>`).join('') : '<li>Advice not available</li>'}
+                                </ul>
+                            </div>
+                            
+                            <div class="advice-category">
+                                <h5>📚 Upskilling</h5>
+                                <ul>
+                                    ${data.careerAdvice.upskilling ? data.careerAdvice.upskilling.map(skill => `<li>${skill}</li>`).join('') : '<li>Advice not available</li>'}
+                                </ul>
+                            </div>
+                            
+                            <div class="advice-category">
+                                <h5>🤝 Networking</h5>
+                                <ul>
+                                    ${data.careerAdvice.networking ? data.careerAdvice.networking.map(network => `<li>${network}</li>`).join('') : '<li>Advice not available</li>'}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 `;
