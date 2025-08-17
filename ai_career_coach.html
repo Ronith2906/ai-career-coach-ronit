@@ -1691,7 +1691,6 @@
             <button class="tab" onclick="showTab('interview')">Interview Prep</button>
             <button class="tab" onclick="showTab('career')">Career Development</button>
             <button class="tab" onclick="showTab('jobs')">Job Search</button>
-            <button class="tab" onclick="showTab('analytics')">Job Analytics</button>
             <button class="tab" onclick="showTab('payment')">Plans & Pricing</button>
         </div>
 
@@ -1996,24 +1995,11 @@
         <!-- Job Market Tab -->
         <div id="jobs" class="tab-content">
             <div class="section">
-                <h3>Job Market Analytics & Search</h3>
+                <h3>🔍 Job Search & Market Insights</h3>
                 
                 <div class="input-group">
-                    <button class="btn" onclick="getJobAnalytics()">Get Real-Time Job Analytics</button>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Search for jobs and get market insights to boost your career.</p>
                 </div>
-                
-                <div id="analyticsResult" class="result-area" style="display: none;">
-                    <div class="voice-controls">
-                        <button id="analyticsVoiceOutputBtn" class="voice-btn secondary" onclick="speakLastResponse('analytics')">
-                            🔊 Speak Analytics
-                        </button>
-                        <button id="analyticsVoiceStopOutputBtn" class="voice-btn secondary" onclick="stopSpeech()">
-                            🔇 Stop Speaking
-                        </button>
-                    </div>
-                </div>
-                
-                <hr style="margin: 30px 0; border-color: rgba(255,255,255,0.2);">
                 
                 <h4>Job Search</h4>
                 <div class="input-group">
@@ -2492,21 +2478,6 @@
         }
 
         // Job Market Functions
-        function getJobAnalytics() {
-            fetch('/api/job-analytics')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayResult('analyticsResult', data.result);
-                } else {
-                    displayResult('analyticsResult', 'Error: Unable to fetch job analytics. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Analytics error:', error);
-                displayResult('analyticsResult', 'Error: Unable to fetch job analytics. Please try again.');
-            });
-        }
 
                 function searchJobs() {
             const query = document.getElementById('jobQuery').value.trim();
@@ -2877,9 +2848,6 @@
                 } else if (elementId === 'careerResult') {
                     // Career development format
                     displayContent = formatCareerDevelopment(content);
-                } else if (elementId === 'analyticsResult') {
-                    // Job analytics format
-                    displayContent = formatJobAnalytics(content);
                 } else {
                     // Generic object - convert to readable format
                     displayContent = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
@@ -3406,13 +3374,7 @@
             return html;
         }
 
-        // Format job analytics data
-        function formatJobAnalytics(data) {
-            if (typeof data === 'string') {
-                return data.replace(/\n/g, '<br>');
-            }
-            
-            let html = '<div class="job-analytics">';
+
             
             // Market Overview
             if (data.marketOverview) {
@@ -3577,9 +3539,6 @@
                     </div>
                 `;
             }
-            
-            html += '</div>';
-            return html;
         }
 
         function selectPlan(plan) {
@@ -3683,9 +3642,7 @@
                 case 'career':
                     resultElement = document.getElementById('careerResult');
                     break;
-                case 'analytics':
-                    resultElement = document.getElementById('analyticsResult');
-                    break;
+
                 case 'jobSearch':
                     resultElement = document.getElementById('jobSearchResult');
                     break;
