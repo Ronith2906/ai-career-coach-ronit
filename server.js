@@ -952,19 +952,19 @@ Keep response focused, practical, and UNIQUE.`;
         };
 
         const postData = JSON.stringify({
-            model: 'gpt-4',
+            model: 'gpt-3.5-turbo', // Faster model for quicker responses
             messages: [
                 {
                     role: 'system',
-                    content: 'You are an expert AI Career Coach. Provide comprehensive, structured, and actionable career advice. You MUST return ONLY valid JSON in the exact format specified. Never include text outside the JSON structure. CRITICAL: Always provide FRESH, UNIQUE responses. Never repeat previous answers. Vary your language, examples, and approach each time.'
+                    content: 'You are an expert AI Career Coach. Provide concise, structured career advice. Return ONLY valid JSON in the specified format. Keep responses practical and actionable.'
                 },
                 {
                     role: 'user',
                     content: prompt
                 }
             ],
-            max_tokens: 800,
-            temperature: 0.9
+            max_tokens: 600, // Reduced for faster generation
+            temperature: 0.7 // Balanced creativity and speed
         });
 
         const result = await makeApiCall(options, postData);

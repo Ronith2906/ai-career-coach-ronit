@@ -1641,7 +1641,8 @@
             <button class="tab" onclick="showTab('coverLetterGeneration')">✉️ Cover Letter Generation</button>
             <button class="tab" onclick="showTab('interview')">Interview Prep</button>
             <button class="tab" onclick="showTab('career')">Career Development</button>
-            <button class="tab" onclick="showTab('jobs')">Job Market</button>
+            <button class="tab" onclick="showTab('jobs')">Job Search</button>
+            <button class="tab" onclick="showTab('analytics')">Job Analytics</button>
             <button class="tab" onclick="showTab('payment')">Plans & Pricing</button>
         </div>
 
@@ -1673,7 +1674,10 @@
 
 
 
-                <button class="btn" onclick="sendChatMessage()">Send Message</button>
+                <button class="btn" onclick="sendChatMessage()" id="chatSendBtn">
+                    <span id="chatBtnText">Send Message</span>
+                    <span id="chatBtnLoading" style="display: none;">⏳ Processing...</span>
+                </button>
                 
                 <div id="chatResult" class="result-area" style="display: none;">
                     <div class="voice-controls">
@@ -1997,7 +2001,7 @@
                     <div class="plan-card">
                         <h4>Free Trial</h4>
                         <div class="plan-price">$0</div>
-                        <p>3 days free access</p>
+                        <p>7 days free access</p>
                         <ul class="plan-features">
                             <li>Basic AI Chat</li>
                             <li>Resume Analysis (2x)</li>
@@ -2369,6 +2373,18 @@
             
             if (!message) return;
             
+            // Show loading state
+            const btn = document.getElementById('chatSendBtn');
+            const btnText = document.getElementById('chatBtnText');
+            const btnLoading = document.getElementById('chatBtnLoading');
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            
+            showLoading('chatResult');
+            addToChatMemory(message);
+            
             fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2376,12 +2392,25 @@
             })
             .then(response => response.json())
             .then(data => {
-                displayResult('chatResult', data.result);
-                input.value = '';
+                if (data.success && data.result) {
+                    displayResult('chatResult', data.result, 'chat');
+                    speakText(data.result.answer || data.result);
+                } else {
+                    throw new Error(data.error || 'Failed to get response');
+                }
             })
             .catch(error => {
                 console.error('Chat error:', error);
                 displayResult('chatResult', 'Error: Unable to get response. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                
+                hideLoading('chatResult');
+                input.value = '';
             });
         }
 
