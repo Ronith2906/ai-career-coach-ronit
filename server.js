@@ -2,7 +2,15 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: './config.env' });
+// Load environment variables - prioritize Heroku environment variables over local config
+if (process.env.NODE_ENV === 'production') {
+    // In production (Heroku), don't load local config file
+    console.log('🚀 Production mode: Using Heroku environment variables');
+} else {
+    // In development, load local config file
+    require('dotenv').config({ path: './config.env' });
+    console.log('🔧 Development mode: Loaded local config.env');
+}
 
 // Document parsing libraries
 const pdfParse = require('pdf-parse');
@@ -82,6 +90,18 @@ setInterval(() => {
 
 const PORT = process.env.PORT || 3006;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'your-openai-api-key-here';
+
+// Debug: Log API key status (without exposing the actual key)
+if (OPENAI_API_KEY && OPENAI_API_KEY !== 'your-openai-api-key-here') {
+    console.log('✅ OpenAI API key configured successfully');
+    console.log(`🔑 Key starts with: ${OPENAI_API_KEY.substring(0, 7)}...`);
+} else {
+    console.log('❌ OpenAI API key not configured');
+    console.log('🔍 Environment check:');
+    console.log(`   - NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`   - OPENAI_API_KEY exists: ${!!process.env.OPENAI_API_KEY}`);
+    console.log(`   - OPENAI_API_KEY length: ${process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0}`);
+}
 
 // MIME types for different file extensions
 const mimeTypes = {
