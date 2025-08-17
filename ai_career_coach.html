@@ -173,6 +173,22 @@
         .section h3, .auth-form h3, .resume-section h4, .cover-letter-section h4 {
             color: #64b5f6 !important;
         }
+        
+        /* Ensure tabs are clearly visible */
+        .tab {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+        }
+        
+        /* Ensure all content areas have proper contrast */
+        .tab-content, .section, .result-area {
+            color: #ffffff !important;
+        }
 
         .container {
             max-width: 1200px;
@@ -212,6 +228,8 @@
             border-radius: 15px;
             padding: 10px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .tab {
