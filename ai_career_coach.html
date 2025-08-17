@@ -686,6 +686,133 @@
             border-radius: 8px;
             border: 1px solid rgba(244, 67, 54, 0.3);
         }
+        
+        /* Comprehensive Loading System */
+        .loading-container {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #64b5f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-message {
+            color: #64b5f6;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #64b5f6;
+            border-radius: 50%;
+            animation: dots 1.4s ease-in-out infinite both;
+        }
+        
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes dots {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Upload Loading */
+        .upload-loading {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .upload-loading p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 10px 0;
+        }
+        
+        .upload-loading .loading-spinner {
+            margin-bottom: 15px;
+        }
+        
+        /* Button Loading States */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .btn.loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+        
+        .btn.loading .btn-loading {
+            opacity: 1;
+        }
+        
+        /* Global Loading Overlay */
+        .global-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .global-loading .loading-spinner {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .global-loading .loading-message {
+            color: #ffffff;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
 
         .container {
             max-width: 1200px;
@@ -2985,6 +3112,8 @@
                 return;
             }
             
+            showLoading('careerResult', '🎯 Generating personalized career development plan...');
+            
             fetch('/api/career-development', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2996,10 +3125,16 @@
             })
             .then(response => response.json())
             .then(data => {
-                displayResult('careerResult', data.result);
+                hideLoading('careerResult');
+                if (data.success) {
+                    displayResult('careerResult', data.result);
+                } else {
+                    throw new Error(data.error || 'Failed to generate career plan');
+                }
             })
             .catch(error => {
                 console.error('Career planning error:', error);
+                hideLoading('careerResult');
                 displayResult('careerResult', 'Error: Unable to generate career plan. Please try again.');
             });
         }
@@ -3366,6 +3501,9 @@
                 showNotification('❌ Interview interface not loaded. Please refresh the page.', 'error');
                 return;
             }
+            
+            // Show loading state
+            showLoading('interviewSession', '🎯 Generating personalized interview questions...');
             
             // Show the interactive interview session instead of static list
             sessionElement.style.display = 'block';
@@ -4401,7 +4539,13 @@
             
             // Show loading state
             const uploadArea = document.querySelector('.file-upload');
-            uploadArea.innerHTML = '<p>📤 Uploading document...</p>';
+            uploadArea.innerHTML = `
+                <div class="upload-loading">
+                    <div class="loading-spinner"></div>
+                    <p>📤 Uploading and processing document...</p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">This may take a few moments for large files</p>
+                </div>
+            `;
             
             // Clear any previous analysis content
             const analysisContent = document.getElementById('analysisContent');
@@ -4779,10 +4923,10 @@
                 return;
             }
             
-            // Show loading state
+            showLoading('coverLetterResult', '✉️ Generating personalized cover letter...');
+            
+            // Show the result area
             const resultDiv = document.getElementById('coverLetterResult');
-            const contentDiv = document.getElementById('coverLetterContent');
-            contentDiv.innerHTML = '<p>✉️ Generating your cover letter...</p>';
             resultDiv.style.display = 'block';
             
             fetch('/api/generate-cover-letter', {
@@ -5243,17 +5387,22 @@ Format this as a structured feedback report.`;
         function showLoading(elementId, message = 'Processing...') {
             const element = document.getElementById(elementId);
             if (element) {
-                // Store the original content if it's the generation result
-                if (elementId === 'generationResult') {
-                    window.originalGenerationContent = element.innerHTML;
-                }
+                // Store the original content for restoration
+                if (!window.originalContent) window.originalContent = {};
+                window.originalContent[elementId] = element.innerHTML;
                 
                 element.innerHTML = `
                     <div class="loading-container">
                         <div class="loading-spinner"></div>
-                        <p>${message}</p>
+                        <p class="loading-message">${message}</p>
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
                 `;
+                element.style.display = 'block';
                 isLoading = true;
             }
         }
@@ -5263,9 +5412,9 @@ Format this as a structured feedback report.`;
             if (element) {
                 isLoading = false;
                 
-                // Restore original content for generation result
-                if (elementId === 'generationResult' && window.originalGenerationContent) {
-                    element.innerHTML = window.originalGenerationContent;
+                // Restore original content if available
+                if (window.originalContent && window.originalContent[elementId]) {
+                    element.innerHTML = window.originalContent[elementId];
                 }
             }
         }
@@ -6254,6 +6403,12 @@ Keep feedback constructive and actionable.`;
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             
+            // Show loading state
+            const loginBtn = document.querySelector('#loginForm button[type="submit"]');
+            const originalText = loginBtn.textContent;
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; margin-right: 10px;"></span>Logging in...';
+            
             try {
                 const response = await fetch('/api/login', {
                     method: 'POST',
@@ -6279,6 +6434,10 @@ Keep feedback constructive and actionable.`;
                 }
             } catch (error) {
                 showNotification('❌ Login failed: ' + error.message, 'error');
+            } finally {
+                // Reset button state
+                loginBtn.disabled = false;
+                loginBtn.textContent = originalText;
             }
         }
         
@@ -6294,6 +6453,12 @@ Keep feedback constructive and actionable.`;
                 showNotification('❌ Passwords do not match', 'error');
                 return;
             }
+            
+            // Show loading state
+            const registerBtn = document.querySelector('#registerForm button[type="submit"]');
+            const originalText = registerBtn.textContent;
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; margin-right: 10px;"></span>Creating account...';
             
             try {
                 const response = await fetch('/api/register', {
@@ -6320,6 +6485,10 @@ Keep feedback constructive and actionable.`;
                 }
             } catch (error) {
                 showNotification('❌ Registration failed: ' + error.message, 'error');
+            } finally {
+                // Reset button state
+                registerBtn.disabled = false;
+                registerBtn.textContent = originalText;
             }
         }
         
