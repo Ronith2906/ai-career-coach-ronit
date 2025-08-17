@@ -1691,6 +1691,7 @@
             <button class="tab" onclick="showTab('interview')">Interview Prep</button>
             <button class="tab" onclick="showTab('career')">Career Development</button>
             <button class="tab" onclick="showTab('jobs')">Job Search</button>
+            <button class="tab" onclick="showTab('analytics')">Job Analytics</button>
             <button class="tab" onclick="showTab('payment')">Plans & Pricing</button>
         </div>
 
@@ -2023,6 +2024,21 @@
                             🔇 Stop Speaking
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <div class="section">
+                <h3>📊 Job Market Analytics</h3>
+                <p>Get insights into current job market trends, salary data, and in-demand skills.</p>
+                
+                <button class="btn" onclick="getJobAnalytics()">📊 Get Market Analytics</button>
+                
+                <div id="analyticsResult" class="result-area" style="display: none;">
+                    <h4>📈 Market Analytics</h4>
+                    <div id="analyticsContent"></div>
                 </div>
             </div>
         </div>
@@ -2478,6 +2494,26 @@
         }
 
         // Job Market Functions
+        function getJobAnalytics() {
+            showLoading('analyticsResult', '📊 Fetching market analytics...');
+            
+            fetch('/api/job-analytics')
+            .then(response => response.json())
+            .then(data => {
+                hideLoading('analyticsResult');
+                
+                if (data.success) {
+                    displayResult('analyticsResult', data.result, 'analytics');
+                } else {
+                    displayResult('analyticsResult', 'Error: Unable to fetch job analytics. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Analytics error:', error);
+                hideLoading('analyticsResult');
+                displayResult('analyticsResult', 'Error: Unable to fetch job analytics. Please try again.');
+            });
+        }
 
                 function searchJobs() {
             const query = document.getElementById('jobQuery').value.trim();
@@ -2848,6 +2884,9 @@
                 } else if (elementId === 'careerResult') {
                     // Career development format
                     displayContent = formatCareerDevelopment(content);
+                } else if (elementId === 'analyticsResult') {
+                    // Job analytics format
+                    displayContent = formatJobAnalytics(content);
                 } else {
                     // Generic object - convert to readable format
                     displayContent = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
@@ -3541,6 +3580,85 @@
             }
         }
 
+        // Format job analytics data
+        function formatJobAnalytics(data) {
+            if (typeof data === 'string') {
+                return data.replace(/\n/g, '<br>');
+            }
+            
+            let html = '<div class="job-analytics">';
+            
+            // Market Overview
+            if (data.marketOverview) {
+                html += `
+                    <div class="analytics-section">
+                        <h4>📊 Market Overview</h4>
+                        <div class="analytics-grid">
+                            <div class="analytics-card">
+                                <h5>📈 Employment Trends</h5>
+                                <ul>
+                                    ${data.marketOverview.employmentTrends ? data.marketOverview.employmentTrends.map(trend => `<li>${trend}</li>`).join('') : '<li>Data not available</li>'}
+                                </ul>
+                            </div>
+                            <div class="analytics-card">
+                                <h5>🚀 Growth Industries</h5>
+                                <ul>
+                                    ${data.marketOverview.growthIndustries ? data.marketOverview.growthIndustries.map(industry => `<li>${industry}</li>`).join('') : '<li>Data not available</li>'}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // In-Demand Skills
+            if (data.inDemandSkills) {
+                html += `
+                    <div class="analytics-section">
+                        <h4>💼 In-Demand Skills</h4>
+                        <div class="skills-grid">
+                            <div class="skills-category">
+                                <h5>🔧 Technical Skills</h5>
+                                <ul>
+                                    ${data.inDemandSkills.technical ? data.inDemandSkills.technical.map(skill => `<li>${skill}</li>`).join('') : '<li>Data not available</li>'}
+                                </ul>
+                            </div>
+                            <div class="skills-category">
+                                <h5>🤝 Soft Skills</h5>
+                                <ul>
+                                    ${data.inDemandSkills.soft ? data.inDemandSkills.soft.map(skill => `<li>${skill}</li>`).join('') : '<li>Data not available</li>'}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Salary Trends
+            if (data.salaryTrends) {
+                html += `
+                    <div class="analytics-section">
+                        <h4>💰 Salary Trends</h4>
+                        <div class="salary-info">
+                            ${data.salaryTrends.byRole ? data.salaryTrends.byRole.map(role => `
+                                <div class="salary-role">
+                                    <h5>${role.role}</h5>
+                                    <div class="salary-levels">
+                                        <span class="salary-level"><strong>Entry Level:</strong> ${role.entryLevel}</span>
+                                        <span class="salary-level"><strong>Mid Level:</strong> ${role.midLevel}</span>
+                                        <span class="salary-level"><strong>Senior:</strong> ${role.senior}</span>
+                                    </div>
+                                </div>
+                            `).join('') : '<p>Salary data not available</p>'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
         function selectPlan(plan) {
             alert(`You selected the ${plan} plan. This feature will be implemented in the full version.`);
         }
@@ -3641,6 +3759,9 @@
                     break;
                 case 'career':
                     resultElement = document.getElementById('careerResult');
+                    break;
+                case 'analytics':
+                    resultElement = document.getElementById('analyticsResult');
                     break;
 
                 case 'jobSearch':

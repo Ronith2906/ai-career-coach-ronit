@@ -676,8 +676,8 @@ async function optimizeResumeWithAI(resumeText, jobDescription) {
     }
 
     // Truncate content to stay within token limits
-    const maxResumeTokens = 2000;
-    const maxJobDescTokens = 1000;
+    const maxResumeTokens = 3000; // Increased from 2000 for maximum assistance
+    const maxJobDescTokens = 1500; // Increased from 1000 for detailed job analysis
     
     resumeText = truncateContent(resumeText, maxResumeTokens, 'Resume for optimization');
     jobDescription = truncateContent(jobDescription, maxJobDescTokens, 'Job Description for optimization');
@@ -735,7 +735,7 @@ Format the response with clear headings, bullet points, and structured sections.
                 content: prompt
             }
         ],
-        max_tokens: 1500,
+        max_tokens: 2500, // Increased from 1500 for maximum assistance
         temperature: 0.5
     });
 
@@ -795,8 +795,8 @@ async function generateCoverLetterWithAI(resumeText, jobDescription, jobTitle, c
     }
 
     // Truncate content to stay within token limits
-    const maxResumeTokens = 1500;
-    const maxJobDescTokens = 800;
+    const maxResumeTokens = 2500; // Increased from 1500 for maximum assistance
+    const maxJobDescTokens = 1200; // Increased from 800 for detailed job analysis
     
     resumeText = truncateContent(resumeText, maxResumeTokens, 'Resume for cover letter');
     jobDescription = truncateContent(jobDescription, maxJobDescTokens, 'Job Description for cover letter');
@@ -852,7 +852,7 @@ Format the response with clear headings, bullet points, and structured sections.
                 content: prompt
             }
         ],
-        max_tokens: 1200,
+        max_tokens: 2000, // Increased from 1200 for maximum assistance
         temperature: 0.6
     });
 
@@ -1993,9 +1993,9 @@ async function handleGenerateResumeAndCoverLetter(req, res) {
 async function generateResumeAndCoverLetterWithAI(resumeText, jobDescription) {
     try {
         // Increase token limits for this combined generation request
-        const maxResumeTokens = 3000; // Increased from 1500
-        const maxJobDescTokens = 1200; // Increased from 800
-        const maxTotalTokens = 4000; // Increased total limit
+        const maxResumeTokens = 4000; // Increased from 3000 for maximum assistance
+        const maxJobDescTokens = 1500; // Increased from 1200 for detailed job analysis
+        const maxTotalTokens = 5000; // Increased total limit for comprehensive generation
         
         // Truncate content to fit within token limits
         const truncatedResume = truncateContent(resumeText, maxResumeTokens, 'resume');
@@ -2049,7 +2049,7 @@ Make both documents ready for immediate use in job applications. The resume shou
                     content: prompt
                 }
             ],
-            max_tokens: 2500, // Increased from 1200 for combined generation
+            max_tokens: 3500, // Increased from 2500 for maximum assistance
             temperature: 0.7
         });
 
