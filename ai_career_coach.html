@@ -8,6 +8,131 @@
     <meta http-equiv="Expires" content="0">
     <title>AI Career Coach - Your Personal Career Assistant</title>
     <style>
+        /* Authentication Styles */
+        .auth-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .auth-container h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .auth-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .auth-form {
+            text-align: left;
+        }
+        
+        .auth-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .auth-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .auth-form button:hover {
+            background: #5a6fd8;
+        }
+        
+        .auth-form p {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .auth-form a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .auth-form a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Main App Styles */
+        .main-app {
+            min-height: 100vh;
+            background: #f5f7fa;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info span {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -1463,11 +1588,51 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>AI Career Coach</h1>
-            <p>Your Personal AI-Powered Career Development Assistant</p>
+    <!-- Authentication Section -->
+    <div id="authSection" class="auth-section">
+        <div class="auth-container">
+            <h2>🔐 Welcome to AI Career Coach</h2>
+            <p>Please login or register to continue</p>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h3>Login</h3>
+                <form onsubmit="handleLogin(event)">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="showRegisterForm()">Register here</a></p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <h3>Register</h3>
+                <form onsubmit="handleRegister(event)">
+                    <input type="text" id="registerName" placeholder="Full Name" required>
+                    <input type="email" id="registerEmail" placeholder="Email" required>
+                    <input type="password" id="registerPassword" placeholder="Password" required>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+                <p>Already have an account? <a href="#" onclick="showLoginForm()">Login here</a></p>
+            </div>
         </div>
+    </div>
+    
+    <!-- Main Application (Hidden until authenticated) -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <div class="container">
+            <div class="header">
+                <div class="header-content">
+                    <h1>AI Career Coach</h1>
+                    <p>Your Personal AI-Powered Career Development Assistant</p>
+                    <div class="user-info">
+                        <span id="userEmail"></span>
+                        <button onclick="logout()" class="btn btn-secondary">Logout</button>
+                    </div>
+                </div>
+            </div>
 
         <div class="tabs">
             <button class="tab active" onclick="showTab('chat')">AI Chat</button>
@@ -5264,6 +5429,150 @@ Keep feedback constructive and actionable.`;
         // Force browser to reload JavaScript (cache busting)
         console.log('AI Career Coach loaded at:', new Date().toISOString());
         
+        // Authentication functions
+        let currentUser = null;
+        let authToken = null;
+        
+        // Check if user is already logged in
+        function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                authToken = token;
+                // Verify token and show main app
+                verifyTokenAndShowApp();
+            } else {
+                showAuthSection();
+            }
+        }
+        
+        function showAuthSection() {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+        
+        function showMainApp() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userData', JSON.stringify(currentUser));
+                    
+                    showMainApp();
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    showNotification('✅ Login successful!', 'success');
+                } else {
+                    showNotification('❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Login failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('❌ Passwords do not match', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userData', JSON.stringify(currentUser));
+                    
+                    showMainApp();
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    showNotification('✅ Registration successful!', 'success');
+                } else {
+                    showNotification('❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Registration failed: ' + error.message, 'error');
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            authToken = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            showAuthSection();
+            showNotification('👋 Logged out successfully', 'info');
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        async function verifyTokenAndShowApp() {
+            try {
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    showMainApp();
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                } else {
+                    // Token invalid, clear and show auth
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userData');
+                    showAuthSection();
+                }
+            } catch (error) {
+                showAuthSection();
+            }
+        }
+        
         // Test voice capabilities on page load
         function testVoiceCapabilities() {
             console.log('Testing voice capabilities...');
@@ -5281,7 +5590,14 @@ Keep feedback constructive and actionable.`;
         }
         
         // Run voice capability test when page loads
-        document.addEventListener('DOMContentLoaded', testVoiceCapabilities);
+        document.addEventListener('DOMContentLoaded', function() {
+            testVoiceCapabilities();
+            checkAuthStatus(); // Check authentication status
+        });
+    </script>
+</div> <!-- Close mainApp div -->
+</body>
+</html>
     </script>
 </body>
 </html>

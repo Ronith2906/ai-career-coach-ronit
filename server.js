@@ -2,6 +2,8 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const db = require('./database');
 // Load environment variables - prioritize Heroku environment variables over local config
 if (process.env.NODE_ENV === 'production') {
     // In production (Heroku), don't load local config file
@@ -90,6 +92,25 @@ setInterval(() => {
 
 const PORT = process.env.PORT || 3006;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'your-openai-api-key-here';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key-change-in-production';
+
+// Authentication middleware
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Access token required' });
+    }
+    
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Invalid or expired token' });
+        }
+        req.user = user;
+        next();
+    });
+}
 
 // Debug: Log API key status (without exposing the actual key)
 if (OPENAI_API_KEY && OPENAI_API_KEY !== 'your-openai-api-key-here') {
@@ -102,6 +123,13 @@ if (OPENAI_API_KEY && OPENAI_API_KEY !== 'your-openai-api-key-here') {
     console.log(`   - OPENAI_API_KEY exists: ${!!process.env.OPENAI_API_KEY}`);
     console.log(`   - OPENAI_API_KEY length: ${process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0}`);
 }
+
+// Initialize database on startup
+db.initializeDatabase().then(() => {
+    console.log('✅ Database initialized successfully');
+}).catch(err => {
+    console.error('❌ Database initialization failed:', err);
+});
 
 // MIME types for different file extensions
 const mimeTypes = {
@@ -201,6 +229,15 @@ function handleApiRequest(req, res, pathname, parsedUrl) {
     res.setHeader('Content-Type', 'application/json');
     
     switch (pathname) {
+        case '/api/register':
+            handleUserRegistration(req, res);
+            break;
+        case '/api/login':
+            handleUserLogin(req, res);
+            break;
+        case '/api/profile':
+            handleUserProfile(req, res);
+            break;
         case '/api/upload-document':
             handleDocumentUpload(req, res);
             break;
@@ -288,6 +325,130 @@ async function makeApiCall(options, postData = null) {
             req.write(postData);
         }
         req.end();
+    });
+}
+
+// Authentication handlers
+function handleUserRegistration(req, res) {
+    if (req.method !== 'POST') {
+        res.writeHead(405);
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+        return;
+    }
+    
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    
+    req.on('end', async () => {
+        try {
+            const { email, password, name } = JSON.parse(body);
+            
+            if (!email || !password) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Email and password are required' }));
+                return;
+            }
+            
+            const user = await db.createUser(email, password, name);
+            const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                message: 'User registered successfully',
+                user: { id: user.id, email: user.email, name: user.name },
+                token: token
+            }));
+        } catch (error) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ error: error.message }));
+        }
+    });
+}
+
+function handleUserLogin(req, res) {
+    if (req.method !== 'POST') {
+        res.writeHead(405);
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+        return;
+    }
+    
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    
+    req.on('end', async () => {
+        try {
+            const { email, password } = JSON.parse(body);
+            
+            if (!email || !password) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Email and password are required' }));
+                return;
+            }
+            
+            const user = await db.authenticateUser(email, password);
+            const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                message: 'Login successful',
+                user: { id: user.id, email: user.email, name: user.name },
+                token: token
+            }));
+        } catch (error) {
+            res.writeHead(401);
+            res.end(JSON.stringify({ error: error.message }));
+        }
+    });
+}
+
+function handleUserProfile(req, res) {
+    if (req.method !== 'GET') {
+        res.writeHead(405);
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+        return;
+    }
+    
+    // Extract token from Authorization header
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        res.writeHead(401);
+        res.end(JSON.stringify({ error: 'Access token required' }));
+        return;
+    }
+    
+    jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+        if (err) {
+            res.writeHead(403);
+            res.end(JSON.stringify({ error: 'Invalid or expired token' }));
+            return;
+        }
+        
+        try {
+            const user = await db.getUserById(decoded.id);
+            
+            if (!user) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'User not found' }));
+                return;
+            }
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                user: user
+            }));
+        } catch (error) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Internal server error' }));
+        }
     });
 }
 
