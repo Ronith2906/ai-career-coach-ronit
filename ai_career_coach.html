@@ -392,6 +392,300 @@
             color: #f44336;
             border: 1px solid rgba(244, 67, 54, 0.5);
         }
+        
+        /* Enhanced Interview Prep Styling - Dark Theme */
+        .interview-session {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .interview-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(100, 181, 246, 0.3);
+        }
+        
+        .interview-header h4 {
+            color: #64b5f6 !important;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .interview-progress {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #questionCounter {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            max-width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .current-question-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .question-display {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-display h5 {
+            color: #64b5f6 !important;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .question-focus, .question-tip {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 8px 0;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+        
+        .question-tip {
+            color: #4caf50;
+            font-style: italic;
+        }
+        
+        .answer-input-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .answer-input-section label {
+            display: block;
+            margin-bottom: 12px;
+            color: #64b5f6;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .answer-input-section textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .answer-input-section textarea:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .answer-input-section textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .answer-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .answer-actions .btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+        
+        .answer-actions .btn.primary {
+            background: linear-gradient(45deg, #64b5f6, #42a5f5);
+            border: none;
+            color: white;
+        }
+        
+        .answer-actions .btn.primary:hover {
+            background: linear-gradient(45deg, #42a5f5, #2196f3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(100, 181, 246, 0.4);
+        }
+        
+        .answer-actions .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .answer-actions .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        /* Interview Complete Section */
+        .interview-complete {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            text-align: center;
+        }
+        
+        .interview-complete h4 {
+            color: #4caf50 !important;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+        }
+        
+        .final-evaluation {
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .final-evaluation h5 {
+            color: #64b5f6 !important;
+            font-size: 1.2em;
+            margin: 20px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(100, 181, 246, 0.3);
+        }
+        
+        .answer-review {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 18px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .answer-review h6 {
+            color: #64b5f6 !important;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .answer-review p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        
+        .comprehensive-feedback {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(100, 181, 246, 0.3);
+            border-left: 4px solid #64b5f6;
+        }
+        
+        .comprehensive-feedback p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .interview-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .interview-actions .btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 160px;
+        }
+        
+        /* Loading States */
+        .btn.loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+        
+        .btn.loading .btn-loading {
+            opacity: 1;
+        }
+        
+        .btn .btn-text, .btn .btn-loading {
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn .btn-loading {
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Loading and Error States */
+        .loading-feedback {
+            text-align: center;
+            padding: 30px;
+            color: #64b5f6;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .error-feedback {
+            text-align: center;
+            padding: 30px;
+            color: #f44336;
+            font-size: 1.1em;
+            font-weight: 600;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
 
         .container {
             max-width: 1200px;
@@ -2115,10 +2409,13 @@
                         
                         <div class="answer-input-section">
                             <label for="userAnswer">Your Answer:</label>
-                            <textarea id="userAnswer" rows="6" placeholder="Type your answer here..."></textarea>
+                            <textarea id="userAnswer" rows="8" placeholder="Type your detailed answer here... (Take your time to provide a comprehensive response)"></textarea>
                             
                             <div class="answer-actions">
-                                <button id="submitAnswerBtn" class="btn primary" onclick="submitAnswer()">✅ Submit Answer</button>
+                                <button id="submitAnswerBtn" class="btn primary" onclick="submitAnswer()">
+                                    <span id="submitBtnText">✅ Submit Answer</span>
+                                    <span id="submitBtnLoading" style="display: none;">⏳ Processing...</span>
+                                </button>
                                 <button id="skipQuestionBtn" class="btn secondary" onclick="skipQuestion()">⏭️ Skip Question</button>
                             </div>
                         </div>
@@ -5712,23 +6009,42 @@ Format this as a structured feedback report.`;
                 return;
             }
             
-            const currentQuestion = interviewSession.questions[interviewSession.currentQuestionIndex];
+            // Show loading state
+            const submitBtn = document.getElementById('submitAnswerBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const submitBtnLoading = document.getElementById('submitBtnLoading');
             
-            // Store user answer
-            interviewSession.userAnswers.push({
-                question: currentQuestion.question,
-                answer: answer,
-                type: currentQuestion.type,
-                category: currentQuestion.category
-            });
+            submitBtn.disabled = true;
+            submitBtnText.style.display = 'none';
+            submitBtnLoading.style.display = 'inline';
             
-            // Clear the answer input
-            document.getElementById('userAnswer').value = '';
-            
-            // Move to next question immediately
-            nextQuestion();
-            
-            showNotification('✅ Answer saved! Moving to next question...', 'success');
+            try {
+                const currentQuestion = interviewSession.questions[interviewSession.currentQuestionIndex];
+                
+                // Store user answer
+                interviewSession.userAnswers.push({
+                    question: currentQuestion.question,
+                    answer: answer,
+                    type: currentQuestion.type,
+                    category: currentQuestion.category
+                });
+                
+                // Clear the answer input
+                document.getElementById('userAnswer').value = '';
+                
+                // Move to next question
+                nextQuestion();
+                
+                showNotification('✅ Answer saved! Moving to next question...', 'success');
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                showNotification('❌ Error saving answer. Please try again.', 'error');
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtnText.style.display = 'inline';
+                submitBtnLoading.style.display = 'none';
+            }
         }
         
         // Skip current question
@@ -5759,16 +6075,24 @@ Format this as a structured feedback report.`;
         async function completeInterview() {
             document.querySelector('.current-question-section').style.display = 'none';
             
-            // Generate comprehensive feedback for all answers
-            await generateComprehensiveFeedback();
-            
-            // Generate final evaluation
-            const finalEvaluation = generateFinalEvaluation();
-            document.getElementById('finalFeedback').innerHTML = finalEvaluation;
-            
+            // Show loading state for final feedback
+            document.getElementById('finalFeedback').innerHTML = '<div class="loading-feedback">⏳ Generating comprehensive feedback for all your answers...</div>';
             document.getElementById('interviewComplete').style.display = 'block';
             
-            showNotification('🎉 Interview complete! Review your comprehensive feedback and areas for development.', 'success');
+            try {
+                // Generate comprehensive feedback for all answers
+                await generateComprehensiveFeedback();
+                
+                // Generate final evaluation with comprehensive feedback
+                const finalEvaluation = generateFinalEvaluation();
+                document.getElementById('finalFeedback').innerHTML = finalEvaluation;
+                
+                showNotification('🎉 Interview complete! Review your comprehensive feedback and areas for development.', 'success');
+            } catch (error) {
+                console.error('Error completing interview:', error);
+                document.getElementById('finalFeedback').innerHTML = '<div class="error-feedback">❌ Error generating feedback. Please try again.</div>';
+                showNotification('❌ Error generating feedback. Please try again.', 'error');
+            }
         }
         
         // Generate comprehensive feedback for all answers
