@@ -22,7 +22,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Rate limiting configuration
 const RATE_LIMIT = {
-    maxRequests: 10,
+    maxRequests: 30, // Increased from 10 to 30 requests per minute
     windowMs: 60000,
     requests: new Map()
 };
@@ -200,8 +200,9 @@ const server = http.createServer((req, res) => {
         if (!checkRateLimit(clientIP)) {
             res.writeHead(429, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ 
-                error: 'Too many requests. Please wait a moment and try again.',
-                retryAfter: 60
+                error: 'Rate limit exceeded. Please wait 1 minute before making more requests. This helps prevent API errors.',
+                retryAfter: 60,
+                tip: 'Try spacing out your requests or wait a moment before trying again.'
             }));
             return;
         }

@@ -4379,6 +4379,10 @@ Format this as a structured feedback report.`;
         const MAX_CHAT_MEMORY = 50;
         let lastResponseHash = ''; // Track last response to prevent repetition
         
+        // Rate Limiting
+        let lastRequestTime = 0;
+        const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+        
         function addToChatMemory(message, response) {
             // Create a hash of the response to detect repetition
             const responseHash = btoa(response.substring(0, 100)).replace(/[^a-zA-Z0-9]/g, '');
@@ -4411,6 +4415,15 @@ Format this as a structured feedback report.`;
             const message = input.value.trim();
             
             if (!message) return;
+            
+            // Rate limiting - prevent rapid successive requests
+            const now = Date.now();
+            if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+                const remainingTime = Math.ceil((MIN_REQUEST_INTERVAL - (now - lastRequestTime)) / 1000);
+                displayResult('chatResult', `⏳ Please wait ${remainingTime} seconds before sending another message. This prevents API rate limit errors.`);
+                return;
+            }
+            lastRequestTime = now;
             
             // Add minimal context from memory to prevent repetition
             let contextMessage = message;
@@ -4467,7 +4480,16 @@ Format this as a structured feedback report.`;
             })
             .catch(error => {
                 console.error('Chat error:', error);
-                displayResult('chatResult', 'Error: Unable to get response. Please try again.');
+                let errorMessage = 'Error: Unable to get response. Please try again.';
+                
+                // Handle specific error types
+                if (error.message && error.message.includes('rate limit')) {
+                    errorMessage = '⏳ Rate limit exceeded. Please wait 2 seconds before sending another message. This prevents API errors.';
+                } else if (error.message && error.message.includes('429')) {
+                    errorMessage = '⏳ Too many requests. Please wait a moment before trying again.';
+                }
+                
+                displayResult('chatResult', errorMessage);
             });
         }
         
