@@ -2160,10 +2160,19 @@ function serveFile(res, filePath, contentType = null) {
 }
 
 // Start the server
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
     console.log(`🚀 Performance-optimized server running at http://localhost:${PORT}/`);
     console.log(`📱 Open your browser and navigate to: http://localhost:${PORT}/`);
     console.log('⏹️  Press Ctrl+C to stop the server');
+    
+    // Initialize database
+    try {
+        await db.initializeDatabase();
+        console.log('✅ Database initialized successfully');
+    } catch (error) {
+        console.error('❌ Database initialization failed:', error.message);
+    }
+    
     console.log('\n⚡ Performance Features Enabled:');
     console.log('   - Response caching (5 minutes)');
     console.log('   - Optimized API timeouts');

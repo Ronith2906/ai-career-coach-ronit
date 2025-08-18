@@ -2,12 +2,14 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-// Database file path
-const dbPath = path.join(__dirname, 'users.db');
+// Database file path - use in-memory for Heroku, file-based for local development
+const dbPath = process.env.NODE_ENV === 'production' ? ':memory:' : path.join(__dirname, 'users.db');
 
 // Initialize database
 function initializeDatabase() {
     return new Promise((resolve, reject) => {
+        console.log(`🔧 Initializing database with path: ${dbPath}`);
+        
         const db = new sqlite3.Database(dbPath, (err) => {
             if (err) {
                 console.error('❌ Error opening database:', err.message);
@@ -29,10 +31,11 @@ function initializeDatabase() {
                 )`, (err) => {
                     if (err) {
                         console.error('❌ Error creating users table:', err.message);
+                        reject(err);
+                        return;
                     } else {
                         console.log('✅ Users table ready');
                     }
-                });
 
                 // User resumes table
                 db.run(`CREATE TABLE IF NOT EXISTS user_resumes (
@@ -45,6 +48,8 @@ function initializeDatabase() {
                 )`, (err) => {
                     if (err) {
                         console.error('❌ Error creating user_resumes table:', err.message);
+                        reject(err);
+                        return;
                     } else {
                         console.log('✅ User resumes table ready');
                     }
@@ -61,6 +66,8 @@ function initializeDatabase() {
                 )`, (err) => {
                     if (err) {
                         console.error('❌ Error creating chat_history table:', err.message);
+                        reject(err);
+                        return;
                     } else {
                         console.log('✅ Chat history table ready');
                     }
@@ -80,6 +87,8 @@ function initializeDatabase() {
                 )`, (err) => {
                     if (err) {
                         console.error('❌ Error creating interview_sessions table:', err.message);
+                        reject(err);
+                        return;
                     } else {
                         console.log('✅ Interview sessions table ready');
                     }
@@ -99,10 +108,20 @@ function initializeDatabase() {
                 )`, (err) => {
                     if (err) {
                         console.error('❌ Error creating resume_analysis table:', err.message);
+                        reject(err);
+                        return;
                     } else {
                         console.log('✅ Resume analysis table ready');
                     }
                 });
+                
+                // All tables created successfully
+                console.log('✅ All database tables initialized successfully');
+                resolve(db);
+            });
+        });
+    });
+}
             });
 
             resolve(db);
