@@ -212,7 +212,7 @@ const server = http.createServer((req, res) => {
     
     // Handle static files
     if (pathname === '/' || pathname === '/index.html') {
-        serveFile(res, './ai_career_coach.html', 'text/html');
+        serveFile(res, './index.html', 'text/html');
         return;
     }
     
