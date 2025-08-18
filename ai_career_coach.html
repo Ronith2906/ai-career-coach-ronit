@@ -2777,6 +2777,16 @@
     <script src="https://unpkg.com/docx@8.5.0/build/index.js" onerror="console.warn('docx library failed to load, will use fallback')"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        // Global variables
+        let chatMemory = [];
+        const MAX_CHAT_MEMORY = 50;
+        let lastRequestTime = 0;
+        const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+        let lastResponseHash = '';
+        
+        // Voice settings
+        window.globalVoiceEnabled = true;
+
         // Library initialization check
         let librariesLoaded = {
             docx: false,
@@ -3987,182 +3997,6 @@
                 html += `
                     <div class="analytics-section">
                         <h4>📊 Market Overview</h4>
-                        
-                        <div class="analytics-grid">
-                            <div class="analytics-card">
-                                <h5>📈 Employment Trends</h5>
-                                <ul>
-                                    ${data.marketOverview.employmentTrends.map(trend => `<li>${trend}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="analytics-card">
-                                <h5>🚀 Growth Industries</h5>
-                                <ul>
-                                    ${data.marketOverview.growthIndustries.map(industry => `<li>${industry}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="analytics-card">
-                                <h5>🏠 Remote Work Statistics</h5>
-                                <div class="remote-stats">
-                                    <p><strong>Percentage:</strong> ${data.marketOverview.remoteWorkStats.percentage}</p>
-                                    <p><strong>Trend:</strong> ${data.marketOverview.remoteWorkStats.trend}</p>
-                                    <p><strong>Top Remote Roles:</strong></p>
-                                    <ul>
-                                        ${data.marketOverview.remoteWorkStats.topRemoteRoles.map(role => `<li>${role}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // In-Demand Skills
-            if (data.inDemandSkills) {
-                html += `
-                    <div class="analytics-section">
-                        <h4>💼 In-Demand Skills</h4>
-                        
-                        <div class="skills-grid">
-                            <div class="skills-category">
-                                <h5>🔧 Technical Skills</h5>
-                                <ul>
-                                    ${data.inDemandSkills.technical.map(skill => `<li>${skill}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="skills-category">
-                                <h5>🤝 Soft Skills</h5>
-                                <ul>
-                                    ${data.inDemandSkills.soft.map(skill => `<li>${skill}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="skills-category">
-                                <h5>🚀 Emerging Skills</h5>
-                                <ul>
-                                    ${data.inDemandSkills.emerging.map(skill => `<li>${skill}</li>`).join('')}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Salary Trends
-            if (data.salaryTrends) {
-                html += `
-                    <div class="analytics-section">
-                        <h4>💰 Salary Trends</h4>
-                        
-                        <div class="salary-info">
-                            ${data.salaryTrends.byRole.map(role => `
-                                <div class="salary-role">
-                                    <h5>${role.role}</h5>
-                                    <div class="salary-levels">
-                                        <span class="salary-level"><strong>Entry Level:</strong> ${role.entryLevel}</span>
-                                        <span class="salary-level"><strong>Mid Level:</strong> ${role.midLevel}</span>
-                                        <span class="salary-level"><strong>Senior:</strong> ${role.senior}</span>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            
-                            <div class="salary-insights">
-                                <h5>📍 Geographic Variations</h5>
-                                <ul>
-                                    ${data.salaryTrends.geographicVariations.map(variation => `<li>${variation}</li>`).join('')}
-                                </ul>
-                                
-                                <h5>📈 Experience Impact</h5>
-                                <p>${data.salaryTrends.experienceImpact}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Job Opportunities
-            if (data.jobOpportunities) {
-                html += `
-                    <div class="analytics-section">
-                        <h4>🎯 Job Opportunities</h4>
-                        
-                        <div class="opportunities-grid">
-                            <div class="opportunity-card">
-                                <h5>📈 High Growth Sectors</h5>
-                                <ul>
-                                    ${data.jobOpportunities.highGrowthSectors.map(sector => `<li>${sector}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="opportunity-card">
-                                <h5>🏠 Remote Availability</h5>
-                                <p class="remote-availability ${data.jobOpportunities.remoteAvailability.toLowerCase()}">${data.jobOpportunities.remoteAvailability}</p>
-                            </div>
-                            
-                            <div class="opportunity-card">
-                                <h5>📊 Entry vs Senior Level</h5>
-                                <div class="level-comparison">
-                                    <p><strong>Entry Level:</strong> ${data.jobOpportunities.entryVsSenior.entryLevel}</p>
-                                    <p><strong>Senior Level:</strong> ${data.jobOpportunities.entryVsSenior.senior}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Career Advice
-            if (data.careerAdvice) {
-                html += `
-                    <div class="analytics-section">
-                        <h4>💡 Career Advice</h4>
-                        
-                        <div class="advice-grid">
-                            <div class="advice-category">
-                                <h5>🏆 Staying Competitive</h5>
-                                <ul>
-                                    ${data.careerAdvice.stayingCompetitive.map(advice => `<li>${advice}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="advice-category">
-                                <h5>📚 Upskilling</h5>
-                                <ul>
-                                    ${data.careerAdvice.upskilling.map(skill => `<li>${skill}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="advice-category">
-                                <h5>🤝 Networking</h5>
-                                <ul>
-                                    ${data.careerAdvice.networking.map(network => `<li>${network}</li>`).join('')}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += '</div>';
-            return html;
-        }
-
-        // Format job analytics data
-        function formatJobAnalytics(data) {
-            if (typeof data === 'string') {
-                return data.replace(/\n/g, '<br>');
-            }
-            
-            let html = '<div class="job-analytics">';
-            
-            // Market Overview
-            if (data.marketOverview) {
-                html += `
-                    <div class="analytics-section">
-                        <h4>📊 Market Overview</h4>
                         <div class="analytics-grid">
                             <div class="analytics-card">
                                 <h5>📈 Employment Trends</h5>
@@ -5022,85 +4856,10 @@ Format this as a structured feedback report.`;
             }
         }
         
-        // Enhanced Voice Functions with Chat Mode
-        function speakText(text, mode = 'general') {
-            if (!window.globalVoiceEnabled) return;
-            
-            // Ensure text is a string and handle different data types
-            let cleanText = '';
-            
-            if (typeof text === 'string') {
-                cleanText = text;
-            } else if (typeof text === 'object' && text !== null) {
-                // Handle JSON objects - try to extract meaningful text
-                if (text.message) {
-                    cleanText = text.message;
-                } else if (text.content) {
-                    cleanText = text.content;
-                } else if (text.text) {
-                    cleanText = text.text;
-                } else if (text.result) {
-                    cleanText = text.result;
-                } else {
-                    // Convert object to string representation
-                    cleanText = JSON.stringify(text);
-                }
-            } else if (text === null || text === undefined) {
-                console.log('No text to speak - null or undefined');
-                return;
-            } else {
-                // Convert other types to string
-                cleanText = String(text);
-            }
-            
-            // Enhanced text cleaning for better speech quality
-            // Remove HTML tags
-            cleanText = cleanText.replace(/<[^>]*>/g, ' ');
-            
-            // Remove emojis and special characters
-            cleanText = cleanText.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
-            
-            // Remove extra special characters that can cause speech issues
-            cleanText = cleanText.replace(/[^\w\s.,!?;:()\-–—]/g, ' ');
-            
-            // Clean up multiple spaces and newlines
-            cleanText = cleanText.replace(/\s+/g, ' ').replace(/\n+/g, ' ').trim();
-            
-            if (!cleanText || cleanText.trim().length === 0) {
-                console.log('No text to speak');
-                return;
-            }
-
-            // Stop any current speech
-            stopSpeech();
-
-            // Create utterance with mode-specific settings
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'en-US';
-            
-            // Chat mode: faster speech for better conversation flow
-            if (mode === 'chat') {
-                utterance.rate = 1.2; // Faster for chat
-                utterance.pitch = 1.1; // Slightly higher pitch for engagement
-            } else {
-                utterance.rate = 0.9; // Normal speed for other modes
-                utterance.pitch = 1.0;
-            }
-            
-            utterance.volume = 0.8;
-            
-            // Speak the text
-            window.speechSynthesis.speak(utterance);
-        }
-        
         // Chat Memory System (Last 50 chats)
-        let chatMemory = [];
-        const MAX_CHAT_MEMORY = 50;
-        let lastResponseHash = ''; // Track last response to prevent repetition
+        // Variables are now defined globally at the top of the script
         
-        // Rate Limiting
-        let lastRequestTime = 0;
-        const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+        // Track last response to prevent repetition
         
         function addToChatMemory(message, response) {
             // Create a hash of the response to detect repetition
