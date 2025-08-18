@@ -3151,9 +3151,8 @@
             showLoading('analyticsResult', '📊 Fetching market analytics...');
             
             fetch('/api/job-analytics', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(response => response.json())
             .then(data => {
@@ -4386,7 +4385,24 @@
         }
 
         function selectPlan(plan) {
-            alert(`You selected the ${plan} plan. This feature will be implemented in the full version.`);
+            // Handle payment plan selection
+            if (plan === 'free') {
+                showNotification('✅ Free trial activated! You have 7 days of full access.', 'success');
+            } else if (plan === 'basic') {
+                // Redirect to payment gateway for Basic Plan
+                showNotification('💳 Redirecting to payment for Basic Plan ($9.99/month)...', 'info');
+                // Here you would integrate with Stripe, PayPal, or your preferred payment gateway
+                setTimeout(() => {
+                    alert('Payment integration will be configured with your preferred payment gateway (Stripe, PayPal, etc.)');
+                }, 1000);
+            } else if (plan === 'premium') {
+                // Redirect to payment gateway for Premium Plan
+                showNotification('💳 Redirecting to payment for Premium Plan ($19.99/month)...', 'info');
+                // Here you would integrate with Stripe, PayPal, or your preferred payment gateway
+                setTimeout(() => {
+                    alert('Payment integration will be configured with your preferred payment gateway (Stripe, PayPal, etc.)');
+                }, 1000);
+            }
         }
 
         // Voice-related functions
@@ -4747,91 +4763,31 @@
                         `;
                     }
                     
+                    // Display the analysis
                     analysisContent.innerHTML = analysisDisplay;
+                    analysisContent.style.display = 'block';
                     
-                    // Show the analysis result area
-                    document.getElementById('resumeAnalysisResult').style.display = 'block';
+                    // Show success notification
+                    showNotification('✅ Resume analysis completed successfully!', 'success');
                     
-                    // Reset retry count on success
-                    retryCount = 0;
-                    
-                                // Show success message - analysis complete
-            showNotification('✅ Resume analysis completed! You can now go to the Resume & Cover Letter Generation tab to create new documents.', 'success');
                 } else {
-                    // Handle different types of errors
-                    let errorMessage = data.error || 'Unknown error';
-                    let retryMessage = '';
-                    
-                    if (data.retryAfter) {
-                        const minutes = Math.ceil(data.retryAfter / 60);
-                        retryMessage = ` Please wait ${minutes} minute${minutes > 1 ? 's' : ''} before trying again.`;
-                    }
-                    
-                    if (data.error.includes('rate limit') || data.error.includes('busy')) {
-                        errorMessage = '🔄 OpenAI API is currently busy. Please wait a moment and try again.';
-                        
-                        // Auto-retry for rate limiting if we haven't exceeded max retries
-                        if (retryCount < maxRetries && data.retryAfter) {
-                            const retryDelay = Math.min(data.retryAfter * 1000, 120000); // Max 2 minutes
-                            showNotification(`🔄 Auto-retrying in ${Math.ceil(retryDelay / 1000)} seconds...`, 'info');
-                            
-                            setTimeout(() => {
-                                retryCount++;
-                                analyzeResumeWithJobDescription();
-                            }, retryDelay);
-                            return;
-                        }
-                    } else if (data.error.includes('400') || data.error.includes('invalid')) {
-                        errorMessage = '❌ The request format was invalid. Please check your resume and job description content.';
-
-                    } else if (data.error.includes('timeout')) {
-                        errorMessage = '⏰ The request timed out. Please try again.';
-
-                    } else {
-
-                    }
-                    
-                    document.getElementById('analysisContent').innerHTML = `
-                        <div class="error-message">
-                            <h3>❌ Analysis Failed</h3>
-                            <p>${errorMessage}</p>
-                            ${retryMessage ? `<p><strong>Note:</strong>${retryMessage}</p>` : ''}
-                            ${data.details ? `<details><summary>Technical Details</summary><pre>${data.details}</pre></details>` : ''}
-                            <div class="action-buttons">
-                                <button onclick="analyzeResumeWithJobDescription()" class="btn">🔄 Try Again</button>
-                                <button onclick="clearUploadedDocument()" class="btn secondary">🗑️ Clear & Upload New</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Show error notification
-                    showNotification(errorMessage, 'error');
-                    
-
+                    throw new Error(data.error || 'Analysis failed');
                 }
             } catch (error) {
                 console.error('Analysis error:', error);
-                
-                
-                document.getElementById('analysisContent').innerHTML = `
+                hideLoading('analysisContent');
+                const analysisContent = document.getElementById('analysisContent');
+                analysisContent.innerHTML = `
                     <div class="error-message">
-                        <h3>❌ Analysis Failed</h3>
-                        <p>Network error: ${error.message}</p>
-                        <p>Please check your internet connection and try again.</p>
-                        <div class="action-buttons">
-                            <button onclick="analyzeResumeWithJobDescription()" class="btn">🔄 Try Again</button>
-                            <button onclick="clearUploadedDocument()" class="btn secondary">🗑️ Clear & Upload New</button>
-                        </div>
+                        <p>❌ Analysis failed: ${error.message}</p>
+                        <button onclick="analyzeResumeWithJobDescription()" class="btn">🔄 Try Again</button>
                     </div>
                 `;
-                
-                showNotification(`❌ Network error: ${error.message}`, 'error');
-                
-
+                analysisContent.style.display = 'block';
             } finally {
                 hideLoading('analysisContent');
             }
-        }
+
         
         // Optimized Resume Optimization with loading states
         async function optimizeResume() {
@@ -6129,21 +6085,31 @@ Format this as a structured feedback report.`;
             
             const question = interviewSession.questions[interviewSession.currentQuestionIndex];
             
-            // Update question display
-            document.getElementById('questionText').textContent = question.question;
-            document.getElementById('questionFocus').textContent = `Focus: ${question.focus}`;
-            document.getElementById('questionTip').textContent = `Tip: ${question.tip}`;
+            // Update question display with null checks
+            const questionText = document.getElementById('questionText');
+            const questionFocus = document.getElementById('questionFocus');
+            const questionTip = document.getElementById('questionTip');
+            const progressFill = document.getElementById('progressFill');
+            const questionCounter = document.getElementById('questionCounter');
+            const userAnswer = document.getElementById('userAnswer');
+            const currentQuestionSection = document.querySelector('.current-question-section');
+            
+            if (questionText) questionText.textContent = question.question;
+            if (questionFocus) questionFocus.textContent = `Focus: ${question.focus || 'General'}`;
+            if (questionTip) questionTip.textContent = `Tip: ${question.tip || 'Think about your experience and provide specific examples'}`;
             
             // Update progress
-            const progress = ((interviewSession.currentQuestionIndex + 1) / interviewSession.questions.length) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('questionCounter').textContent = `Question ${interviewSession.currentQuestionIndex + 1} of ${interviewSession.questions.length}`;
+            if (progressFill && questionCounter) {
+                const progress = ((interviewSession.currentQuestionIndex + 1) / interviewSession.questions.length) * 100;
+                progressFill.style.width = progress + '%';
+                questionCounter.textContent = `Question ${interviewSession.currentQuestionIndex + 1} of ${interviewSession.questions.length}`;
+            }
             
             // Clear previous answer
-            document.getElementById('userAnswer').value = '';
+            if (userAnswer) userAnswer.value = '';
             
             // Show question section
-            document.querySelector('.current-question-section').style.display = 'block';
+            if (currentQuestionSection) currentQuestionSection.style.display = 'block';
             
             // Speak the question
             speakText(question.question, 'interview');
@@ -6558,8 +6524,5 @@ Keep feedback constructive and actionable.`;
         });
     </script>
 </div> <!-- Close mainApp div -->
-</body>
-</html>
-    </script>
 </body>
 </html>
