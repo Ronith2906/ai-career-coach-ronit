@@ -212,6 +212,9 @@ const server = http.createServer((req, res) => {
     
     // Handle static files
     if (pathname === '/' || pathname === '/index.html') {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         serveFile(res, './index.html', 'text/html');
         return;
     }
