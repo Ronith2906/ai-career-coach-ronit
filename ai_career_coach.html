@@ -2774,7 +2774,7 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js" onerror="console.warn('docx library failed to load, will use fallback')"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Global variables
@@ -6388,9 +6388,7 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/search-jobs', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, location })
             })
             .then(response => response.json())
@@ -6421,9 +6419,7 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/generate-resume-and-cover-letter', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     resumeContent: window.uploadedResumeContent || "Experienced professional seeking new opportunities",
                     jobDescription: jobDesc
@@ -6458,9 +6454,7 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/generate-resume-and-cover-letter', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     resumeContent: window.uploadedResumeContent || "Experienced professional seeking new opportunities",
                     jobDescription: jobDesc
@@ -6494,13 +6488,6 @@ Keep feedback constructive and actionable.`;
             
             showNotification('🔄 Interview reset. Click "Start Question-by-Question Interview" to begin again.', 'info');
         }
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('AI Career Coach Application Initialized');
-            checkAuthStatus();
-        });
-
     </script>
 </div> <!-- Close mainApp div -->
 </body>
