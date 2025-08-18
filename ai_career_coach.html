@@ -6571,7 +6571,7 @@ Keep feedback constructive and actionable.`;
             }
         }
 
-        // Add missing functions that are referenced in HTML
+        // Add missing essential functions
         function analyzeResumeWithJobDescription() {
             const jobDesc = document.getElementById('analysisJobDescription').value.trim();
             const resumeContent = window.uploadedResumeContent;
@@ -6619,12 +6619,10 @@ Keep feedback constructive and actionable.`;
             }
             
             showNotification('✅ Answer submitted! Moving to next question...', 'success');
-            // Basic implementation - can be enhanced later
         }
 
         function skipQuestion() {
             showNotification('⏭️ Question skipped! Moving to next question...', 'info');
-            // Basic implementation - can be enhanced later
         }
 
         function downloadInterviewReport() {
