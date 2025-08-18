@@ -6204,8 +6204,6 @@ Keep feedback constructive and actionable.`;
             }
         });
 
-
-
         function updateVoiceUI(isRecording) {
             const voiceButtons = document.querySelectorAll('.voice-btn');
             voiceButtons.forEach(btn => {
@@ -6225,16 +6223,16 @@ Keep feedback constructive and actionable.`;
             
             switch (currentVoiceMode) {
                 case 'chat':
-                    targetInput = document.getElementById('userMessage');
+                    targetInput = document.getElementById('chatInput');
                     break;
                 case 'resume':
-                    targetInput = document.getElementById('jobDescription');
+                    targetInput = document.getElementById('resumeJobDescription');
                     break;
                 case 'coverLetter':
-                    targetInput = document.getElementById('coverLetterJobDesc');
+                    targetInput = document.getElementById('coverLetterJobDescription');
                     break;
                 case 'interview':
-                    targetInput = document.getElementById('interviewJobDesc');
+                    targetInput = document.getElementById('interviewJobDescription');
                     break;
                 case 'career':
                     targetInput = document.getElementById('careerGoals');
@@ -6243,7 +6241,7 @@ Keep feedback constructive and actionable.`;
                     targetInput = document.getElementById('analyticsQuery');
                     break;
                 case 'jobSearch':
-                    targetInput = document.getElementById('jobTitle');
+                    targetInput = document.getElementById('jobQuery');
                     break;
             }
             
