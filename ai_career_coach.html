@@ -2275,7 +2275,7 @@
                     <input type="password" id="loginPassword" placeholder="Password" required>
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
-                <p>Don't have an account? <a href="#" onclick="showRegisterForm()">Register here</a></p>
+                <p>Don't have an account? <a href="#" id="showRegisterLink">Register here</a></p>
             </div>
             
             <!-- Register Form -->
@@ -2288,7 +2288,7 @@
                     <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
-                <p>Already have an account? <a href="#" onclick="showLoginForm()">Login here</a></p>
+                <p>Already have an account? <a href="#" id="showLoginLink">Login here</a></p>
             </div>
         </div>
     </div>
@@ -6521,6 +6521,24 @@ Keep feedback constructive and actionable.`;
         document.addEventListener('DOMContentLoaded', function() {
             testVoiceCapabilities();
             checkAuthStatus(); // Check authentication status
+            
+            // Add event listeners for authentication navigation
+            const showRegisterLink = document.getElementById('showRegisterLink');
+            const showLoginLink = document.getElementById('showLoginLink');
+            
+            if (showRegisterLink) {
+                showRegisterLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showRegisterForm();
+                });
+            }
+            
+            if (showLoginLink) {
+                showLoginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLoginForm();
+                });
+            }
         });
     </script>
 </div> <!-- Close mainApp div -->
