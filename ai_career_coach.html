@@ -6495,6 +6495,12 @@ Keep feedback constructive and actionable.`;
             showNotification('🔄 Interview reset. Click "Start Question-by-Question Interview" to begin again.', 'info');
         }
 
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AI Career Coach Application Initialized');
+            checkAuthStatus();
+        });
+
     </script>
 </div> <!-- Close mainApp div -->
 </body>
