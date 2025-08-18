@@ -6442,23 +6442,7 @@ Keep feedback constructive and actionable.`;
             }
         });
 
-        // Add missing functions that are referenced but not defined
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            // Add to page
-            document.body.appendChild(notification);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 5000);
-        }
+
 
         function updateVoiceUI(isRecording) {
             const voiceButtons = document.querySelectorAll('.voice-btn');
