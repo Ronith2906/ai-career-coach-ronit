@@ -2946,30 +2946,6 @@
             }
         }
 
-        // Update voice input in appropriate field
-        function updateVoiceInput(transcript) {
-            let targetField;
-            
-            switch(currentVoiceMode) {
-                case 'chat':
-                    targetField = document.getElementById('chatInput');
-                    break;
-                case 'resume':
-                    targetField = document.getElementById('jobDescription');
-                    break;
-                case 'interview':
-                    targetField = document.getElementById('interviewJobDesc');
-                    break;
-                case 'career':
-                    targetField = document.getElementById('userProfile');
-                    break;
-            }
-            
-            if (targetField) {
-                targetField.value = transcript;
-            }
-        }
-
         // Enhanced voice error handling for mobile and desktop
         function handleVoiceError(error) {
             console.error('Voice error:', error);
