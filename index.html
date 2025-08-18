@@ -4608,66 +4608,7 @@
             }
         }
         
-        // Enhanced Cover Letter Generation
-        function generateCoverLetter() {
-            const jobDesc = document.getElementById('jobDescription').value.trim();
-            
-            if (!jobDesc) {
-                alert('Please enter a job description first.');
-                return;
-            }
-            
-            showLoading('coverLetterResult', '✉️ Generating personalized cover letter...');
-            
-            // Show the result area
-            const resultDiv = document.getElementById('coverLetterResult');
-            resultDiv.style.display = 'block';
-            
-            fetch('/api/generate-cover-letter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    resumeText: window.uploadedResumeContent || 'Generate a professional cover letter', 
-                    jobDescription: jobDesc, 
-                    userId: 'user123' 
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const coverLetter = data.result || data.coverLetter;
-                    window.coverLetterContent = coverLetter; // Store for download
-                    
-                    contentDiv.innerHTML = `
-                        <div class="cover-letter-content">
-                            <h3>✉️ Your Cover Letter</h3>
-                            <div class="letter-text">
-                                ${coverLetter.replace(/\n/g, '<br>')}
-                            </div>
-                            <div class="action-buttons">
-                                <button onclick="downloadCoverLetter()" class="btn primary">📥 Download Cover Letter</button>
-                                <button onclick="copyCoverLetterToClipboard()" class="btn secondary">📋 Copy to Clipboard</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Show voice controls
-                    const voiceControls = resultDiv.querySelector('.voice-controls');
-                    if (voiceControls) {
-                        voiceControls.style.display = 'flex';
-                    }
-                    
-                    // Show success notification
-                    showNotification('✅ Cover letter generated successfully! You can now download it.', 'success');
-                } else {
-                    contentDiv.innerHTML = '<p>❌ Cover letter generation failed. Please try again.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Cover letter error:', error);
-                contentDiv.innerHTML = '<p>❌ Error: Unable to generate cover letter. Please try again.</p>';
-            });
-        }
+
         
         // Interview Practice System
         let currentInterviewQuestions = [];
@@ -5971,21 +5912,7 @@ Keep feedback constructive and actionable.`;
             return html;
         }
         
-        // Restart interview
-        function restartInterview() {
-            interviewSession = {
-                questions: [],
-                currentQuestionIndex: 0,
-                userAnswers: [],
-                feedback: [],
-                comprehensiveFeedback: null
-            };
-            
-            document.getElementById('interviewSession').style.display = 'none';
-            document.getElementById('interviewResult').style.display = 'none';
-            
-            showNotification('🔄 Interview reset. Click "Start Question-by-Question Interview" to begin again.', 'info');
-        }
+
         
         // Utility function to shuffle array
         function shuffleArray(array) {
