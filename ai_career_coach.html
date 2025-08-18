@@ -6314,6 +6314,137 @@ Keep feedback constructive and actionable.`;
                 window.speechSynthesis.speak(utterance);
             }
         }
+
+        // Add missing functions that are referenced in HTML
+        function analyzeResumeWithJobDescription() {
+            const jobDesc = document.getElementById('analysisJobDescription').value.trim();
+            const resumeContent = window.uploadedResumeContent;
+            
+            if (!jobDesc || !resumeContent) {
+                alert('Please provide both a job description and upload a resume first.');
+                return;
+            }
+            
+            showLoading('analysisContent', '🔍 Analyzing resume with AI...');
+            
+            fetch('/api/analyze-resume-with-jd', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    resumeContent: resumeContent,
+                    jobDescription: jobDesc
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading('analysisContent');
+                if (data.success) {
+                    displayResult('analysisContent', data.analysis);
+                    document.getElementById('resumeAnalysisResult').style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+            })
+            .catch(error => {
+                console.error('Analysis error:', error);
+                hideLoading('analysisContent');
+                displayResult('analysisContent', 'Error: Unable to analyze resume. Please try again.');
+            });
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('userAnswer').value.trim();
+            
+            if (!answer) {
+                showNotification('❌ Please provide an answer before submitting', 'error');
+                return;
+            }
+            
+            // Store the answer and move to next question
+            if (window.interviewSession && window.interviewSession.userAnswers) {
+                window.interviewSession.userAnswers.push({
+                    question: document.getElementById('questionText').textContent,
+                    answer: answer
+                });
+            }
+            
+            // Move to next question or complete interview
+            if (window.interviewSession && window.interviewSession.currentQuestionIndex < window.interviewSession.questions.length - 1) {
+                window.interviewSession.currentQuestionIndex++;
+                showCurrentQuestion();
+            } else {
+                completeInterview();
+            }
+        }
+
+        function skipQuestion() {
+            // Move to next question
+            if (window.interviewSession && window.interviewSession.currentQuestionIndex < window.interviewSession.questions.length - 1) {
+                window.interviewSession.currentQuestionIndex++;
+                showCurrentQuestion();
+            } else {
+                completeInterview();
+            }
+        }
+
+        function showCurrentQuestion() {
+            // Implementation for showing current question
+            console.log('Showing current question');
+        }
+
+        function completeInterview() {
+            // Implementation for completing interview
+            console.log('Interview completed');
+        }
+
+        function restartInterview() {
+            // Reset interview session
+            if (window.interviewSession) {
+                window.interviewSession.currentQuestionIndex = 0;
+                window.interviewSession.userAnswers = [];
+            }
+            document.getElementById('interviewSession').style.display = 'none';
+            showNotification('🔄 Interview reset. Click "Start Question-by-Question Interview" to begin again.', 'info');
+        }
+
+        function downloadInterviewReport() {
+            // Implementation for downloading interview report
+            showNotification('📥 Interview report download feature coming soon!', 'info');
+        }
+
+        function startInteractiveInterview() {
+            // Implementation for starting interactive interview
+            console.log('Starting interactive interview');
+        }
+
+        function generateComprehensiveFeedback() {
+            // Implementation for generating comprehensive feedback
+            console.log('Generating comprehensive feedback');
+        }
+
+        function generateFinalEvaluation() {
+            // Implementation for generating final evaluation
+            console.log('Generating final evaluation');
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Initialize interview session object
+        window.interviewSession = {
+            questions: [],
+            currentQuestionIndex: 0,
+            userAnswers: [],
+            feedback: []
+        };
     </script>
 </div> <!-- Close mainApp div -->
 </body>
