@@ -215,7 +215,8 @@ const server = http.createServer((req, res) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        serveFile(res, './clean_app.html', 'text/html');
+        res.setHeader('Last-Modified', new Date().toUTCString());
+        serveFile(res, './final_app.html', 'text/html');
         return;
     }
     
