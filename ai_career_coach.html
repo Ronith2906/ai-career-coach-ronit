@@ -2822,19 +2822,19 @@
                     } else if (content.analysis) {
                         // Resume analysis format
                         displayContent = formatResumeAnalysis(content);
-                                    } else if (elementId === 'chatResult') {
-                    // Chat response format
-                    displayContent = formatChatResponse(content);
-                } else if (elementId === 'careerResult') {
-                    // Career development format
-                    displayContent = formatCareerDevelopment(content);
-                } else if (elementId === 'analyticsResult') {
-                    // Job analytics format
-                    displayContent = formatJobAnalytics(content);
-                } else {
-                    // Generic object - convert to readable format
-                    displayContent = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
-                }
+                    } else if (elementId === 'chatResult') {
+                        // Chat response format
+                        displayContent = formatChatResponse(content);
+                    } else if (elementId === 'careerResult') {
+                        // Career development format
+                        displayContent = formatCareerDevelopment(content);
+                    } else if (elementId === 'analyticsResult') {
+                        // Job analytics format
+                        displayContent = formatJobAnalytics(content);
+                    } else {
+                        // Generic object - convert to readable format
+                        displayContent = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
+                    }
                 } else {
                     displayContent = String(content);
                 }
