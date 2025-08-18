@@ -246,6 +246,48 @@
             box-shadow: 0 0 15px rgba(100, 181, 246, 0.3);
             background: rgba(255, 255, 255, 0.15);
         }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         
         .analytics-section .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.6);
@@ -6538,6 +6580,135 @@ Keep feedback constructive and actionable.`;
                 });
             }
         });
+
+        // Add missing functions that are referenced but not defined
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        function updateVoiceUI(isRecording) {
+            const voiceButtons = document.querySelectorAll('.voice-btn');
+            voiceButtons.forEach(btn => {
+                if (isRecording) {
+                    btn.innerHTML = '⏹️ Stop';
+                    btn.classList.add('recording');
+                } else {
+                    btn.innerHTML = '🎤 Start Voice Input';
+                    btn.classList.remove('recording');
+                }
+            });
+        }
+
+        function updateVoiceInput(transcript) {
+            // Find the appropriate input field based on current voice mode
+            let targetInput = null;
+            
+            switch (currentVoiceMode) {
+                case 'chat':
+                    targetInput = document.getElementById('userMessage');
+                    break;
+                case 'resume':
+                    targetInput = document.getElementById('jobDescription');
+                    break;
+                case 'coverLetter':
+                    targetInput = document.getElementById('coverLetterJobDesc');
+                    break;
+                case 'interview':
+                    targetInput = document.getElementById('interviewJobDesc');
+                    break;
+                case 'career':
+                    targetInput = document.getElementById('careerGoals');
+                    break;
+                case 'analytics':
+                    targetInput = document.getElementById('analyticsQuery');
+                    break;
+                case 'jobSearch':
+                    targetInput = document.getElementById('jobTitle');
+                    break;
+            }
+            
+            if (targetInput) {
+                targetInput.value = transcript;
+                targetInput.focus();
+            }
+        }
+
+        function handleVoiceError(error) {
+            console.error('Voice recognition error:', error);
+            let errorMessage = 'Voice recognition error occurred';
+            
+            switch (error) {
+                case 'no-speech':
+                    errorMessage = 'No speech detected. Please try again.';
+                    break;
+                case 'audio-capture':
+                    errorMessage = 'Microphone access denied. Please check permissions.';
+                    break;
+                case 'not-allowed':
+                    errorMessage = 'Microphone access denied. Please allow microphone access.';
+                    break;
+                case 'network':
+                    errorMessage = 'Network error. Please check your connection.';
+                    break;
+            }
+            
+            showNotification('❌ ' + errorMessage, 'error');
+        }
+
+        function requestMicrophonePermission() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        console.log('Microphone permission granted');
+                        stream.getTracks().forEach(track => track.stop());
+                    })
+                    .catch(function(err) {
+                        console.log('Microphone permission denied:', err);
+                        showNotification('❌ Microphone access denied. Please enable microphone permissions.', 'error');
+                    });
+            }
+        }
+
+        function showMobileVoiceFallback() {
+            console.log('Showing mobile voice fallback');
+            // For mobile devices without speech recognition, show a message
+            showNotification('ℹ️ Voice input not supported on this device. Please use text input.', 'info');
+        }
+
+        function stopVoiceInput() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+        }
+
+        function stopSpeaking() {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function speakText(text) {
+            if (window.speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
     </script>
 </div> <!-- Close mainApp div -->
 </body>
