@@ -6388,99 +6388,9 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/search-jobs', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query, location })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading('jobSearchResult');
-                if (data.success) {
-                    displayResult('jobSearchResult', data.result);
-                } else {
-                    throw new Error(data.error || 'Failed to search jobs');
-                }
-            })
-            .catch(error => {
-                console.error('Job search error:', error);
-                hideLoading('jobSearchResult');
-                displayResult('jobSearchResult', 'Error: Unable to search jobs. Please try again.');
-            });
-        }
-
-
-
-        // Add missing essential functions
-        function analyzeResumeWithJobDescription() {
-            const jobDesc = document.getElementById('analysisJobDescription').value.trim();
-            const resumeContent = window.uploadedResumeContent;
-            
-            if (!jobDesc || !resumeContent) {
-                alert('Please provide both a job description and upload a resume first.');
-                return;
-            }
-            
-            showLoading('analysisContent', '🔍 Analyzing resume with AI...');
-            
-            fetch('/api/analyze-resume-with-jd', {
-                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    resumeContent: resumeContent,
-                    jobDescription: jobDesc
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading('analysisContent');
-                if (data.success) {
-                    displayResult('analysisContent', data.analysis);
-                    document.getElementById('resumeAnalysisResult').style.display = 'block';
-                } else {
-                    throw new Error(data.error || 'Analysis failed');
-                }
-            })
-            .catch(error => {
-                console.error('Analysis error:', error);
-                hideLoading('analysisContent');
-                displayResult('analysisContent', 'Error: Unable to analyze resume. Please try again.');
-            });
-        }
-
-        function submitAnswer() {
-            const answer = document.getElementById('userAnswer').value.trim();
-            
-            if (!answer) {
-                showNotification('❌ Please provide an answer before submitting', 'error');
-                return;
-            }
-            
-            showNotification('✅ Answer submitted! Moving to next question...', 'success');
-        }
-
-        function skipQuestion() {
-            showNotification('⏭️ Question skipped! Moving to next question...', 'info');
-        }
-
-        function downloadInterviewReport() {
-            showNotification('📥 Interview report download feature coming soon!', 'info');
-        }
-
-        function searchJobs() {
-            const query = document.getElementById('jobQuery').value.trim();
-            const location = document.getElementById('jobLocation').value.trim();
-            
-            if (!query) {
-                showNotification('Please enter a job title or keywords to search.', 'error');
-                return;
-            }
-            
-            showLoading('jobSearchResult', '🔍 Searching for jobs...');
-            
-            fetch('/api/search-jobs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, location })
             })
             .then(response => response.json())
@@ -6511,7 +6421,9 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/generate-resume-and-cover-letter', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                     resumeContent: window.uploadedResumeContent || "Experienced professional seeking new opportunities",
                     jobDescription: jobDesc
@@ -6546,7 +6458,9 @@ Keep feedback constructive and actionable.`;
             
             fetch('/api/generate-resume-and-cover-letter', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                     resumeContent: window.uploadedResumeContent || "Experienced professional seeking new opportunities",
                     jobDescription: jobDesc
@@ -6580,6 +6494,7 @@ Keep feedback constructive and actionable.`;
             
             showNotification('🔄 Interview reset. Click "Start Question-by-Question Interview" to begin again.', 'info');
         }
+
     </script>
 </div> <!-- Close mainApp div -->
 </body>
