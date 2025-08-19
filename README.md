@@ -1,4 +1,4 @@
-# AI Career Coach - Your Personal Career Assistant
+# Ron's AI Career Coach - Your Personal Career Assistant
 
 An intelligent AI-powered career coaching application that helps users with resume analysis, cover letter generation, interview preparation, and career development planning.
 

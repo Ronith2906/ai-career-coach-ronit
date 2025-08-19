@@ -1,4 +1,4 @@
-# 🚀 Heroku Deployment Guide for AI Career Coach
+# 🚀 Heroku Deployment Guide for Ron's AI Career Coach
 
 ## Prerequisites
 - Heroku account (free tier available)
@@ -167,6 +167,6 @@ If you encounter issues:
 
 ---
 
-**Your AI Career Coach is now ready for the world! 🎉**
+**Your Ron's AI Career Coach is now ready for the world! 🎉**
 
 Share your URL: `https://your-ai-career-coach-app.herokuapp.com`

@@ -1,0 +1,4265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ron's AI Career Coach - Your Personal Career Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #b8b8b8;
+            margin-bottom: 20px;
+        }
+
+        .motivational-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .motivational-banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .motivational-banner p {
+            font-size: 1.1rem;
+            color: #e8e8e8;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin-left: auto;
+            color: white;
+        }
+
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-input::placeholder {
+            color: #b8b8b8;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .voice-btn.recording {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            font-size: 14px;
+            padding: 10px 16px;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        /* File Upload Styling */
+        .file-upload-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-container input[type="file"] {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .file-upload-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+        }
+
+        .file-upload-info:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-upload-info span {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-info small {
+            color: #b8b8b8;
+            font-size: 12px;
+        }
+
+        /* Voice Input Styling */
+        .voice-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .voice-input-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .voice-input-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .voice-input-btn.recording {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .btn-stop:hover {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e8e8e8;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b8b8b8;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .job-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+
+        .job-company {
+            color: #ff6b6b;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .job-location {
+            color: #4ecdc4;
+            font-size: 0.9rem;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .analytics-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .analytics-label {
+            color: #b8b8b8;
+            font-size: 0.9rem;
+        }
+
+        /* Trial Banner Styling */
+        .trial-banner {
+            background: linear-gradient(135deg, #00d4ff, #4ecdc4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+            text-align: center;
+        }
+
+        .trial-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .trial-info p {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+        }
+
+        .trial-progress {
+            margin-top: 15px;
+        }
+
+        .trial-progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .trial-progress-fill {
+            background: #ff6b6b;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Payment Plans Styling */
+        .payment-plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .payment-plan-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .payment-plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .payment-plan-card.featured {
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .plan-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .plan-header h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            color: #b8b8b8;
+            font-weight: 400;
+        }
+
+        .plan-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .plan-features li {
+            color: #b8b8b8;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-action {
+            text-align: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Payment Information */
+        .payment-info {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            color: #b8b8b8;
+            line-height: 1.6;
+        }
+
+        /* Usage Statistics */
+        .usage-stats {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .usage-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .usage-label {
+            color: #b8b8b8;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .usage-value {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .usage-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .usage-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Job Search LinkedIn Style */
+        .search-filters {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-filters .form-group {
+            margin-bottom: 15px;
+        }
+
+        .search-filters select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .market-insights {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .insight-title {
+            color: #b8b8b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .insight-value {
+            color: #00d4ff;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Job Search Styling */
+        .job-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .job-count {
+            color: #00d4ff;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .job-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .job-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .job-header {
+            margin-bottom: 15px;
+        }
+
+        .job-title {
+            color: #00d4ff;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .job-company {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .job-location {
+            color: #b8b8b8;
+            font-size: 0.9rem;
+        }
+
+        .job-details {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .job-type, .job-salary, .job-experience {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .job-description {
+            color: #b8b8b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .job-description::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(15, 15, 35, 0.9));
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #b8b8b8;
+        }
+
+        .no-results h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        /* Interview Styles */
+        .question-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .download-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Ron's AI Career Coach</h1>
+            <p>Your Personal AI-Powered Career Development Assistant</p>
+        </div>
+
+        <div class="motivational-banner">
+            <h2>💪 Today's Motivation</h2>
+            <p id="motivationalMessage">Loading motivational message...</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showTab('chat', this)">💬 AI Chat</div>
+            <div class="tab" onclick="showTab('resume', this)">📄 Resume Analysis</div>
+            <div class="tab" onclick="showTab('coverLetter', this)">✉️ Cover Letter & Resume</div>
+            <div class="tab" onclick="showTab('interview', this)">🎯 Interview Prep</div>
+            <div class="tab" onclick="showTab('jobSearch', this)">🔍 Job Search</div>
+            <div class="tab" onclick="showTab('payment', this)">💳 Payment Plans</div>
+            <div class="tab" onclick="showTab('careerPlan', this)">🎯 Career Planning</div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div id="chat" class="tab-content active">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        👋 Hello! I'm Ron's AI Career Coach. I'm here to help you with career advice, resume tips, interview preparation, and more. What would you like to discuss today?
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about your career..." onkeypress="handleChatKeyPress(event)">
+                    <button class="btn voice-btn" id="voiceBtn" onclick="toggleVoiceRecognition()" title="Voice Input">
+                        🎤
+                    </button>
+                    <button class="btn" onclick="sendMessage()">Send</button>
+                    <button class="btn btn-stop" id="stopSpeechBtn" onclick="stopSpeech()" title="Stop Speaking" style="display: none;">
+                        🔇 Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Analysis Tab -->
+        <div id="resume" class="tab-content">
+            <h2>📄 Resume Analysis & Scoring</h2>
+            <div class="form-group">
+                <label for="resumeFile">Upload Resume (PDF/DOCX):</label>
+                <input type="file" id="resumeFile" accept=".pdf,.docx,.doc" onchange="handleResumeUpload(event)">
+                <small style="color: #b8b8b8;">Or paste content below:</small>
+            </div>
+            <div class="form-group">
+                <label for="resumeText">Resume Content:</label>
+                <textarea id="resumeText" rows="8" placeholder="Paste your resume content here or upload a file above..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="resumeJobDescription">Job Description (for targeted analysis):</label>
+                <textarea id="resumeJobDescription" rows="6" placeholder="Paste the job description to analyze how well your resume matches the role..."></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn" onclick="analyzeResume()">🔍 Analyze Resume</button>
+            </div>
+            <div id="resumeResult" class="result-container" style="display: none;"></div>
+        </div>
+
+        <!-- Cover Letter & Resume Generation Tab -->
+        <div id="coverLetter" class="tab-content">
+            <h2>🚀 Resume & Cover Letter Generator</h2>
+            <p style="color: #b8b8b8; margin-bottom: 20px;">Upload your resume and provide a job description to get both an optimized resume and personalized cover letter.</p>
+            
+            <!-- Combined Generation Section -->
+            <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h3>📁 Upload Resume & Generate Both</h3>
+                
+                <!-- File Upload Section -->
+                <div class="form-group">
+                    <label for="resumeFileUpload">Upload Your Resume:</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="resumeFileUpload" accept=".pdf,.docx,.txt" onchange="handleResumeFileUpload(event)">
+                        <div class="file-upload-info" onclick="document.getElementById('resumeFileUpload').click()">
+                            <span>📁 Choose PDF, Word, or Text file</span>
+                            <small>Max size: 5MB</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resume Text Display -->
+                <div class="form-group">
+                    <label for="resumeTextDisplay">Resume Content (editable):</label>
+                    <textarea id="resumeTextDisplay" rows="10" placeholder="Your resume content will appear here after upload..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobDescriptionForGeneration">Job Description:</label>
+                    <textarea id="jobDescriptionForGeneration" rows="6" placeholder="Paste the job description to optimize your resume and generate a cover letter..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn" onclick="generateResumeAndCoverLetter()">🚀 Generate Both</button>
+                </div>
+                
+                <!-- Results Container -->
+                <div id="combinedResults" class="result-container" style="display: none;">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Interview Prep Tab -->
+        <div id="interview" class="tab-content">
+            <h2>🎯 Interview Preparation</h2>
+            <div class="form-group">
+                <label for="interviewRole">Target Role:</label>
+                <input type="text" id="interviewRole" placeholder="e.g., Software Engineer, Marketing Manager...">
+            </div>
+            <div class="form-group">
+                <label for="interviewJobDesc">Job Description (for personalized questions):</label>
+                <textarea id="interviewJobDesc" rows="4" placeholder="Paste the job description for tailored questions..."></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn" onclick="generateInterviewQuestions()">❓ Get Questions</button>
+                <button class="btn btn-secondary" onclick="startInteractiveInterview()">🎭 Start Interactive Interview</button>
+            </div>
+            <div id="interviewResult" class="result-container" style="display: none;"></div>
+            
+            <!-- Interactive Interview Container -->
+            <div id="interviewContainer" class="result-container" style="display: none;">
+                <h3>🎭 Interactive Interview Session</h3>
+                
+                <!-- Question Display -->
+                <div id="currentQuestion" class="question-display" style="margin-bottom: 30px;"></div>
+                
+                <!-- Answer Input Section -->
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label for="userAnswer" style="font-size: 16px; font-weight: bold; margin-bottom: 10px; display: block; color: #fff;">
+                        🎯 Your Answer:
+                    </label>
+                    <textarea 
+                        id="userAnswer" 
+                        rows="6" 
+                        placeholder="Type your detailed answer here or use voice input below... Speak clearly and provide specific examples!"
+                        style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 14px; resize: vertical;"
+                    ></textarea>
+                    
+                    <!-- Voice Input Controls -->
+                    <div class="voice-input-container" style="margin-top: 15px; text-align: center;">
+                        <button id="voiceInputBtn" class="voice-input-btn" onclick="startVoiceInput()" style="margin-right: 10px;">
+                            🎤 Start Voice Input
+                        </button>
+                        <button id="stopVoiceBtn" class="voice-input-btn" onclick="stopVoiceInput()" style="display: none; background: #ff6b6b;">
+                            ⏹️ Stop Recording
+                        </button>
+                        <div id="voiceStatus" style="color: #b8b8b8; font-size: 14px; margin-top: 10px; font-style: italic;"></div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="form-group" style="text-align: center; margin-bottom: 25px;">
+                    <button class="btn" onclick="submitAnswer()" style="margin-right: 15px; padding: 12px 25px; font-size: 16px;">
+                        📝 Submit Answer & Continue
+                    </button>
+                    <button class="btn btn-secondary" onclick="skipQuestion()" style="margin-right: 15px; padding: 12px 25px; font-size: 16px;">
+                        ⏭️ Skip Question
+                    </button>
+                    <button class="btn" onclick="speakLastQuestion()" style="padding: 12px 25px; font-size: 16px;">
+                        🔊 Repeat Question
+                    </button>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div id="interviewProgress" style="margin-bottom: 25px;"></div>
+                
+                <!-- Current Answer Preview -->
+                <div id="answerPreview" style="margin-top: 20px; padding: 20px; background: rgba(76, 175, 80, 0.1); border-radius: 15px; border-left: 4px solid #4caf50; display: none;">
+                    <h4 style="color: #4caf50; margin-bottom: 15px;">📝 Answer Preview:</h4>
+                    <div id="answerPreviewText" style="white-space: pre-wrap; line-height: 1.6; color: #fff; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px;"></div>
+                </div>
+                
+                <!-- Instructions -->
+                <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">💡 Interview Tips:</h4>
+                    <ul style="color: #b8b8b8; line-height: 1.6; margin-left: 20px;">
+                        <li>Take your time to think before answering</li>
+                        <li>Use specific examples from your experience</li>
+                        <li>Speak clearly and confidently</li>
+                        <li>You can edit your answer before submitting</li>
+                        <li>Use voice input for natural responses</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Interview Results -->
+            <div id="interviewResults" class="result-container" style="display: none;">
+                <h3>📊 Interview Performance Summary</h3>
+                <div id="interviewFeedback"></div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <button class="btn" onclick="downloadInterviewReport()">📄 Download Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Search Tab -->
+        <div id="jobSearch" class="tab-content">
+            <h2>🔍 LinkedIn-Style Job Search</h2>
+            <p style="color: #b8b8b8; margin-bottom: 20px; text-align: center;">Discover real-time job opportunities with comprehensive market insights</p>
+            
+            <!-- Search Filters -->
+            <div class="search-filters">
+                <div class="form-group">
+                    <label for="jobTitle">Job Title:</label>
+                    <input type="text" id="jobTitle" placeholder="e.g., Software Developer, Data Analyst...">
+                </div>
+                <div class="form-group">
+                    <label for="jobLocation">Location:</label>
+                    <input type="text" id="jobLocation" placeholder="e.g., Remote, New York, San Francisco...">
+                </div>
+                <div class="form-group">
+                    <label for="jobType">Job Type:</label>
+                    <select id="jobType">
+                        <option value="">All Types</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="remote">Remote</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="internship">Internship</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="experienceLevel">Experience Level:</label>
+                    <select id="experienceLevel">
+                        <option value="">All Levels</option>
+                        <option value="entry">Entry Level (0-2 years)</option>
+                        <option value="mid">Mid Level (3-5 years)</option>
+                        <option value="senior">Senior Level (6-8 years)</option>
+                        <option value="lead">Lead (8-10 years)</option>
+                        <option value="executive">Executive (10+ years)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="salaryRange">Salary Range:</label>
+                    <select id="salaryRange">
+                        <option value="">Any Salary</option>
+                        <option value="0-50000">$0 - $50K</option>
+                        <option value="50000-80000">$50K - $80K</option>
+                        <option value="80000-120000">$80K - $120K</option>
+                        <option value="120000-150000">$120K - $150K</option>
+                        <option value="150000+">$150K+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn" onclick="searchJobs()">🔍 Search Jobs</button>
+                    <button class="btn btn-secondary" onclick="clearJobFilters()">🗑️ Clear Filters</button>
+                    <button class="btn btn-outline" onclick="refreshMarketData()">🔄 Refresh Data</button>
+                    <button class="btn btn-secondary" onclick="viewSavedJobs()">💾 Saved Jobs</button>
+                    <button class="btn btn-secondary" onclick="viewAppliedJobs()">📝 Applied Jobs</button>
+                </div>
+            </div>
+            
+            <!-- Real-time Market Insights -->
+            <div class="market-insights">
+                <h3>📊 Real-time Market Insights</h3>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">🔥</div>
+                        <div class="insight-title">Hot Skills</div>
+                        <div class="insight-value" id="hotSkills">Loading...</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">💰</div>
+                        <div class="insight-title">Avg Salary</div>
+                        <div class="insight-value" id="avgSalary">Loading...</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">📈</div>
+                        <div class="insight-title">Market Trend</div>
+                        <div class="insight-value" id="marketTrend">Loading...</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">🌍</div>
+                        <div class="insight-title">Remote Jobs</div>
+                        <div class="insight-value" id="remoteJobs">Loading...</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">📊</div>
+                        <div class="insight-title">Active Jobs</div>
+                        <div class="insight-value" id="activeJobs">Loading...</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">🚀</div>
+                        <div class="insight-title">Growth Rate</div>
+                        <div class="insight-value" id="growthRate">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Job Results with LinkedIn-style layout -->
+            <div id="jobResults" class="result-container" style="display: none;">
+                <div class="job-results-header">
+                    <h3>📋 Job Results</h3>
+                    <div class="job-count" id="jobCount">0 jobs found</div>
+                </div>
+                <div class="job-list" id="jobList"></div>
+            </div>
+        </div>
+
+        <!-- Payment Plans Tab -->
+        <div id="payment" class="tab-content">
+            <h2>💳 Subscription Plans & Pricing</h2>
+            <p style="color: #b8b8b8; margin-bottom: 30px; text-align: center;">Choose the perfect plan for your career development needs</p>
+            
+            <!-- Trial Status Banner -->
+            <div id="trialStatus" class="trial-banner" style="display: none;">
+                <div class="trial-info">
+                    <h3>🎉 Free Trial Active</h3>
+                    <p id="trialDaysRemaining">You have <span id="daysRemaining">7</span> days remaining in your free trial</p>
+                    <div class="trial-progress">
+                        <div class="trial-progress-bar">
+                            <div id="trialProgressFill" class="trial-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-plans-grid">
+                <!-- Free Plan -->
+                <div class="payment-plan-card">
+                    <div class="plan-header">
+                        <h3>🚀 Free Trial</h3>
+                        <div class="plan-price">$0<span>/7 days</span></div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ AI Career Chat (25 messages)</li>
+                            <li>✅ Basic Resume Analysis</li>
+                            <li>✅ Interview Questions (10 questions)</li>
+                            <li>✅ Job Search (limited)</li>
+                            <li>✅ Basic Career Planning</li>
+                            <li>✅ Real-time Market Insights</li>
+                        </ul>
+                    </div>
+                    <div class="plan-action">
+                        <button class="btn btn-outline" onclick="selectPlan('free')">Start Free Trial</button>
+                    </div>
+                </div>
+                
+                <!-- Starter Plan -->
+                <div class="payment-plan-card featured">
+                    <div class="plan-badge">Most Popular</div>
+                    <div class="plan-header">
+                        <h3>⭐ Starter</h3>
+                        <div class="plan-price">$9.99<span>/month</span></div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ AI Career Chat (200 messages/month)</li>
+                            <li>✅ Advanced Resume Analysis</li>
+                            <li>✅ Resume & Cover Letter Generation</li>
+                            <li>✅ Interactive Interview Prep</li>
+                            <li>✅ Unlimited Job Search</li>
+                            <li>✅ Detailed Career Planning</li>
+                            <li>✅ Real-time Market Insights</li>
+                            <li>✅ Priority Support</li>
+                        </ul>
+                    </div>
+                    <div class="plan-action">
+                        <button class="btn" onclick="selectPlan('starter')">Upgrade Now</button>
+                    </div>
+                </div>
+                
+                <!-- Professional Plan -->
+                <div class="payment-plan-card">
+                    <div class="plan-header">
+                        <h3>💎 Professional</h3>
+                        <div class="plan-price">$19.99<span>/month</span></div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ Unlimited AI Career Chat</li>
+                            <li>✅ Premium Resume Analysis</li>
+                            <li>✅ Unlimited Resume Generation</li>
+                            <li>✅ Advanced Interview Coaching</li>
+                            <li>✅ Priority Job Matching</li>
+                            <li>✅ Personalized Career Roadmap</li>
+                            <li>✅ 1-on-1 Career Consultation</li>
+                            <li>✅ Resume ATS Optimization</li>
+                            <li>✅ Advanced Job Analytics</li>
+                            <li>✅ Custom Career Templates</li>
+                        </ul>
+                    </div>
+                    <div class="plan-action">
+                        <button class="btn" onclick="selectPlan('professional')">Upgrade Now</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Information -->
+            <div class="payment-info">
+                <h3>💳 Payment & Billing</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>🔒 Secure Payments</h4>
+                        <p>All payments are processed securely through Stripe with bank-level encryption.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>📅 Billing Cycle</h4>
+                        <p>Monthly billing with automatic renewal. Cancel anytime with no hidden fees.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🔄 Plan Changes</h4>
+                        <p>Upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>💰 Refund Policy</h4>
+                        <p>30-day money-back guarantee. If you're not satisfied, we'll refund your payment.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Usage -->
+            <div class="usage-stats">
+                <h3>📊 Your Current Usage</h3>
+                <div class="usage-grid">
+                    <div class="usage-card">
+                        <div class="usage-label">AI Chat Messages</div>
+                        <div class="usage-value">8/10</div>
+                        <div class="usage-bar">
+                            <div class="usage-progress" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="usage-card">
+                        <div class="usage-label">Resume Analysis</div>
+                        <div class="usage-value">2/3</div>
+                        <div class="usage-bar">
+                            <div class="usage-progress" style="width: 67%"></div>
+                        </div>
+                    </div>
+                    <div class="usage-card">
+                        <div class="usage-label">Interview Questions</div>
+                        <div class="usage-value">3/5</div>
+                        <div class="usage-bar">
+                            <div class="usage-progress" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Planning Tab -->
+        <div id="careerPlan" class="tab-content">
+            <h2>🎯 Career Development Plan</h2>
+            <div class="form-group">
+                <label for="currentRole">Current Role:</label>
+                <input type="text" id="currentRole" placeholder="e.g., Junior Developer, Marketing Assistant...">
+            </div>
+            <div class="form-group">
+                <label for="targetRole">Target Role:</label>
+                <input type="text" id="targetRole" placeholder="e.g., Senior Developer, Marketing Manager...">
+            </div>
+            <div class="form-group">
+                <label for="experience">Years of Experience:</label>
+                <input type="number" id="experience" placeholder="e.g., 3" min="0" max="50">
+            </div>
+            <div class="form-group">
+                <button class="btn" onclick="generateCareerPlan()">🎯 Generate Plan</button>
+            </div>
+            <div id="careerPlanResult" class="result-container" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global variables
+        let isRecording = false;
+        let recognition = null;
+        let chatMemory = [];
+
+        // User authentication state
+        let currentUser = null;
+        let userToken = localStorage.getItem('userToken');
+        let userProfile = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMotivationalMessage();
+            initializeVoiceRecognition();
+            checkAuthStatus();
+        });
+
+        // Tab management
+        function showTab(tabName, clickedElement) {
+            // Stop any ongoing speech when changing tabs
+            stopSpeech();
+            
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            clickedElement.classList.add('active');
+        }
+
+        // Motivational messages
+        function loadMotivationalMessage() {
+            const messages = [
+                "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill",
+                "The only way to do great work is to love what you do. - Steve Jobs",
+                "Your time is limited, don't waste it living someone else's life. - Steve Jobs",
+                "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+                "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+                "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
+                "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
+                "The way to get started is to quit talking and begin doing. - Walt Disney"
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            document.getElementById('motivationalMessage').textContent = randomMessage;
+        }
+
+        // Voice recognition and speech synthesis
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatInput').value = transcript;
+                    isRecording = false;
+                    document.getElementById('voiceBtn').classList.remove('recording');
+                    document.getElementById('voiceBtn').textContent = '🎤';
+                    sendMessage();
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    showNotification('Voice recognition error: ' + event.error, 'error');
+                    isRecording = false;
+                    document.getElementById('voiceBtn').classList.remove('recording');
+                    document.getElementById('voiceBtn').textContent = '🎤';
+                };
+                
+                // Initialize interview voice recognition
+                interviewRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                interviewRecognition.continuous = false;
+                interviewRecognition.interimResults = false;
+                interviewRecognition.lang = 'en-US';
+                
+                interviewRecognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    const userAnswer = document.getElementById('userAnswer');
+                    if (userAnswer) {
+                        userAnswer.value = transcript;
+                        updateAnswerPreview(transcript);
+                    }
+                };
+                
+                interviewRecognition.onerror = function(event) {
+                    console.error('Interview speech recognition error:', event.error);
+                    stopVoiceInput();
+                };
+                
+                interviewRecognition.onend = function() {
+                    stopVoiceInput();
+                };
+            }
+        }
+
+        // Conversational voice output
+        function speakText(text, mode = 'conversational') {
+            if (speechSynthesis) {
+                // Stop any current speech
+                if (currentUtterance) {
+                    speechSynthesis.cancel();
+                }
+                
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                
+                // Set voice properties based on mode
+                if (mode === 'conversational') {
+                    currentUtterance.rate = 0.9;
+                    currentUtterance.pitch = 1.1;
+                    currentUtterance.volume = 0.8;
+                } else if (mode === 'interview') {
+                    currentUtterance.rate = 0.8;
+                    currentUtterance.pitch = 1.0;
+                    currentUtterance.volume = 0.9;
+                }
+                
+                // Get available voices and set a good one
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.includes('en') && voice.name.includes('Female')
+                ) || voices.find(voice => voice.lang.includes('en')) || voices[0];
+                
+                if (preferredVoice) {
+                    currentUtterance.voice = preferredVoice;
+                }
+                
+                currentUtterance.onstart = function() {
+                    // Show stop button when speech starts
+                    const stopBtn = document.getElementById('stopSpeechBtn');
+                    if (stopBtn) stopBtn.style.display = 'inline-block';
+                };
+                
+                currentUtterance.onend = function() {
+                    currentUtterance = null;
+                    // Hide stop button when speech ends
+                    const stopBtn = document.getElementById('stopSpeechBtn');
+                    if (stopBtn) stopBtn.style.display = 'none';
+                };
+                
+                speechSynthesis.speak(currentUtterance);
+            }
+        }
+
+        function stopSpeech() {
+            if (speechSynthesis && currentUtterance) {
+                speechSynthesis.cancel();
+                currentUtterance = null;
+            }
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                showNotification('Voice recognition not supported in this browser', 'error');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+                isRecording = false;
+                document.getElementById('voiceBtn').classList.remove('recording');
+                document.getElementById('voiceBtn').textContent = '🎤';
+            } else {
+                recognition.start();
+                isRecording = true;
+                document.getElementById('voiceBtn').classList.add('recording');
+                document.getElementById('voiceBtn').textContent = '⏹️';
+            }
+        }
+
+        // Interview Voice Input Functions
+        function startVoiceInput() {
+            if (!interviewRecognition) {
+                showNotification('Voice recognition not supported in this browser', 'error');
+                return;
+            }
+
+            try {
+                interviewRecognition.start();
+                document.getElementById('voiceInputBtn').style.display = 'none';
+                document.getElementById('stopVoiceBtn').style.display = 'inline-block';
+                document.getElementById('voiceStatus').textContent = '🎤 Recording... Speak now!';
+                document.getElementById('voiceInputBtn').classList.add('recording');
+            } catch (error) {
+                console.error('Voice input error:', error);
+                showNotification('Failed to start voice input', 'error');
+            }
+        }
+
+        function stopVoiceInput() {
+            if (interviewRecognition) {
+                interviewRecognition.stop();
+            }
+            document.getElementById('voiceInputBtn').style.display = 'inline-block';
+            document.getElementById('stopVoiceBtn').style.display = 'none';
+            document.getElementById('voiceStatus').textContent = '';
+            document.getElementById('voiceInputBtn').classList.remove('recording');
+        }
+
+        function updateAnswerPreview(text) {
+            const previewDiv = document.getElementById('answerPreview');
+            const previewText = document.getElementById('answerPreviewText');
+            if (previewDiv && previewText) {
+                previewText.textContent = text;
+                previewDiv.style.display = 'block';
+            }
+        }
+
+        // Chat functionality
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            input.value = '';
+            
+            // Show loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant';
+            loadingDiv.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>AI is thinking...</div>';
+            document.getElementById('chatMessages').appendChild(loadingDiv);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                // Remove loading message
+                loadingDiv.remove();
+                
+                if (result.error) {
+                    addMessageToChat('assistant', 'Sorry, I encountered an error: ' + result.error);
+                } else {
+                    addMessageToChat('assistant', result.response);
+                    // Speak the response conversationally
+                    speakText(result.response, 'conversational');
+                    // Add to memory for context
+                    chatMemory.push({ role: 'user', content: message });
+                    chatMemory.push({ role: 'assistant', content: result.response });
+                    
+                    // Keep only last 10 messages for context
+                    if (chatMemory.length > 10) {
+                        chatMemory = chatMemory.slice(-10);
+                    }
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                addMessageToChat('assistant', 'Sorry, I encountered an error. Please try again.');
+                console.error('Chat error:', error);
+            }
+        }
+
+        function addMessageToChat(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Resume file upload handling
+        async function handleResumeUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showNotification('Processing document...', 'info');
+            
+            try {
+                if (file.type === 'application/pdf') {
+                    // For PDFs, try to extract text using pdf-parse
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdfData = new Uint8Array(arrayBuffer);
+                    
+                    // Try to extract text from PDF
+                    const extractedText = await extractTextFromPDF(pdfData);
+                    if (extractedText) {
+                        document.getElementById('resumeText').value = extractedText;
+                        showNotification('PDF text extracted successfully!', 'success');
+                    } else {
+                        document.getElementById('resumeText').value = `PDF uploaded: ${file.name}\n\nPlease paste the text content below for analysis.`;
+                        showNotification('PDF uploaded. Please paste the text content below.', 'info');
+                    }
+                } else if (file.type.includes('word') || file.type.includes('docx')) {
+                    // For Word docs, try to extract text
+                    const arrayBuffer = await file.arrayBuffer();
+                    const extractedText = await extractTextFromWord(arrayBuffer);
+                    if (extractedText) {
+                        document.getElementById('resumeText').value = extractedText;
+                        showNotification('Word document text extracted successfully!', 'success');
+                    } else {
+                        document.getElementById('resumeText').value = `Word document uploaded: ${file.name}\n\nPlease paste the text content below for analysis.`;
+                        showNotification('Word document uploaded. Please paste the text content below.', 'info');
+                    }
+                } else {
+                    showNotification('Unsupported file type. Please upload PDF or Word documents.', 'error');
+                }
+            } catch (error) {
+                console.error('File processing error:', error);
+                document.getElementById('resumeText').value = `File uploaded: ${file.name}\n\nPlease paste the text content below for analysis.`;
+                showNotification('File uploaded. Please paste the text content below.', 'info');
+            }
+        }
+
+        // Extract text from PDF using pdf-parse
+        async function extractTextFromPDF(pdfData) {
+            try {
+                // Check if pdf-parse is available
+                if (typeof pdfjsLib !== 'undefined' && pdfjsLib.getDocument) {
+                    const loadingTask = pdfjsLib.getDocument({data: pdfData});
+                    const pdf = await loadingTask.promise;
+                    let fullText = '';
+                    
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n';
+                    }
+                    
+                    return fullText.trim();
+                } else {
+                    console.log('PDF.js library not available');
+                    return null;
+                }
+            } catch (error) {
+                console.error('PDF extraction error:', error);
+                return null;
+            }
+        }
+
+        // Extract text from Word document
+        async function extractTextFromWord(arrayBuffer) {
+            try {
+                // Check if mammoth is available
+                if (typeof mammoth !== 'undefined' && mammoth.extractRawText) {
+                    const result = await mammoth.extractRawText({arrayBuffer});
+                    return result.value;
+                } else {
+                    console.log('Mammoth library not available');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Word extraction error:', error);
+                return null;
+            }
+        }
+
+        // File Upload Handler for Resume
+        async function handleResumeFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('File too large. Please choose a file under 5MB.', 'error');
+                return;
+            }
+            
+            const fileType = file.name.split('.').pop().toLowerCase();
+            if (!['pdf', 'docx', 'txt'].includes(fileType)) {
+                showNotification('Please upload PDF, Word, or text files only.', 'error');
+                return;
+            }
+            
+            try {
+                const text = await extractTextFromFile(file, fileType);
+                document.getElementById('resumeTextDisplay').value = text;
+                showNotification('Resume uploaded successfully!', 'success');
+                
+                // Update file upload info
+                const fileInfo = document.querySelector('.file-upload-info span');
+                if (fileInfo) {
+                    fileInfo.textContent = `✅ ${file.name} uploaded successfully`;
+                }
+            } catch (error) {
+                showNotification('Failed to process file: ' + error.message, 'error');
+                console.error('File processing error:', error);
+            }
+        }
+
+        // Extract text from uploaded file
+        async function extractTextFromFile(file, fileType) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async function(e) {
+                    try {
+                        let text = '';
+                        
+                        if (fileType === 'txt') {
+                            text = e.target.result;
+                        } else if (fileType === 'pdf') {
+                            try {
+                                text = await extractTextFromPDF(e.target.result);
+                            } catch (pdfError) {
+                                console.warn('PDF extraction failed, using fallback:', pdfError);
+                                text = `PDF content from ${file.name}\n\nPlease paste the text content manually below:`;
+                            }
+                        } else if (fileType === 'docx') {
+                            try {
+                                text = await extractTextFromWord(e.target.result);
+                            } catch (docxError) {
+                                console.warn('Word extraction failed, using fallback:', docxError);
+                                text = `Word document content from ${file.name}\n\nPlease paste the text content manually below:`;
+                            }
+                        }
+                        
+                        if (!text || text.trim() === '') {
+                            text = `File uploaded: ${file.name}\n\nPlease paste the text content manually below:`;
+                        }
+                        
+                        resolve(text);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                
+                if (fileType === 'txt') {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        // Resume Analysis
+        async function analyzeResume() {
+            const resumeText = document.getElementById('resumeText').value.trim();
+            const jobDescription = document.getElementById('resumeJobDescription').value.trim();
+            
+            if (!resumeText) {
+                showNotification('Please enter your resume content', 'error');
+                return;
+            }
+            
+            const analyzeBtn = document.querySelector('button[onclick="analyzeResume()"]');
+            if (analyzeBtn) {
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.innerHTML = '<span class="loading-spinner"></span>Analyzing...';
+                analyzeBtn.disabled = true;
+            }
+            
+            showLoading('resumeResult');
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+                
+                const response = await fetch('/api/resume-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resumeText,
+                        jobDescription: jobDescription,
+                        userId: 'guest-user'
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Access denied. Please check your plan limits.');
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Analysis failed: ' + result.error, 'error');
+                } else {
+                    displayResumeAnalysis(result);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    showNotification('Analysis timed out. Please try again.', 'error');
+                } else {
+                    showNotification('Analysis failed: ' + error.message, 'error');
+                }
+                console.error('Resume analysis error:', error);
+                
+                // Show error in result area
+                const resultDiv = document.getElementById('resumeResult');
+                if (resultDiv) {
+                    resultDiv.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <h4>❌ Analysis Failed</h4>
+                            <p>${error.message}</p>
+                            <button class="btn" onclick="analyzeResume()">🔄 Retry</button>
+                        </div>
+                    `;
+                }
+            } finally {
+                // Reset button state
+                const analyzeBtn = document.querySelector('button[onclick="analyzeResume()"]');
+                if (analyzeBtn) {
+                    analyzeBtn.classList.remove('loading');
+                    analyzeBtn.innerHTML = '🔍 Analyze Resume';
+                    analyzeBtn.disabled = false;
+                }
+            }
+        }
+
+        function displayResumeAnalysis(result) {
+            hideLoading('resumeResult');
+            
+            const resultDiv = document.getElementById('resumeResult');
+            
+            // Parse the analysis result to extract structured information
+            let analysis = result.analysis || 'Analysis completed successfully';
+            let score = '85'; // Default score
+            let strengths = ['Strong technical skills', 'Good experience', 'Clear formatting'];
+            let improvements = ['Could add more quantifiable achievements', 'Consider adding certifications'];
+            let jobAlignment = '75'; // Default job alignment
+            
+            // Try to extract structured data if available
+            if (result.score) score = result.score;
+            if (result.strengths) strengths = result.strengths;
+            if (result.improvements) improvements = result.improvements;
+            if (result.jobAlignment) jobAlignment = result.jobAlignment;
+            
+            resultDiv.innerHTML = `
+                <h3>📊 Resume Analysis Results</h3>
+                
+                <!-- Overall Score -->
+                <div style="text-align: center; margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px;">
+                    <h4 style="margin-bottom: 10px;">Overall Resume Score</h4>
+                    <div style="font-size: 3rem; font-weight: bold; color: #00d4ff;">${score}/100</div>
+                </div>
+                
+                <!-- Job Alignment Score -->
+                <div style="text-align: center; margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #ff6b6b, #ee5a24); border-radius: 15px;">
+                    <h4 style="margin-bottom: 10px;">Job Alignment Score</h4>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #ffd700;">${jobAlignment}/100</div>
+                    <small style="color: #fff;">How well your resume matches the job requirements</small>
+                </div>
+                
+                <!-- Key Strengths -->
+                <div style="margin: 20px 0; padding: 20px; background: rgba(76, 175, 80, 0.1); border-radius: 15px; border-left: 4px solid #4caf50;">
+                    <h4 style="color: #4caf50; margin-bottom: 15px;">✅ Key Strengths</h4>
+                    <ul style="margin-left: 20px;">
+                        ${strengths.map(strength => `<li style="margin-bottom: 8px;">${strength}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <!-- Areas for Development -->
+                <div style="margin: 20px 0; padding: 20px; background: rgba(255, 152, 0, 0.1); border-radius: 15px; border-left: 4px solid #ff9800;">
+                    <h4 style="color: #ff9800; margin-bottom: 15px;">🔧 Areas for Development</h4>
+                    <ul style="margin-left: 20px;">
+                        ${improvements.map(improvement => `<li style="margin-bottom: 8px;">${improvement}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div style="margin: 20px 0; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                    <h4 style="margin-bottom: 15px;">📝 Detailed Analysis</h4>
+                    <p style="line-height: 1.6;">${analysis}</p>
+                </div>
+                
+                <div class="download-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="downloadResumeAsWord()">📄 Download Analysis as Word</button>
+                    <button class="btn btn-secondary" onclick="downloadResumeAsPDF()">📊 Download Analysis as PDF</button>
+                </div>
+            `;
+
+            document.getElementById('resumeResult').style.display = 'block';
+        }
+
+        // Combined Resume and Cover Letter Generation
+        async function generateResumeAndCoverLetter() {
+            const resumeText = document.getElementById('resumeTextDisplay').value.trim();
+            const jobDesc = document.getElementById('jobDescriptionForGeneration').value.trim();
+            
+            if (!resumeText) {
+                showNotification('Please upload or enter your resume content', 'error');
+                return;
+            }
+            
+            if (!jobDesc) {
+                showNotification('Please enter the job description', 'error');
+                return;
+            }
+            
+            const generateBtn = document.querySelector('button[onclick="generateResumeAndCoverLetter()"]');
+            if (generateBtn) {
+                generateBtn.classList.add('loading');
+                generateBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+                generateBtn.disabled = true;
+            }
+            
+            showLoading('combinedResults');
+            
+            try {
+                const response = await fetch('/api/generate-resume-coverletter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resumeText,
+                        jobDescription: jobDesc,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Generation failed: ' + result.error, 'error');
+                } else {
+                    displayCombinedResults(result);
+                }
+            } catch (error) {
+                showNotification('Generation failed: ' + error.message, 'error');
+                console.error('Combined generation error:', error);
+            } finally {
+                // Reset button state
+                const generateBtn = document.querySelector('button[onclick="generateResumeAndCoverLetter()"]');
+                if (generateBtn) {
+                    generateBtn.classList.remove('loading');
+                    generateBtn.innerHTML = '🚀 Generate Both';
+                    generateBtn.disabled = false;
+                }
+            }
+        }
+
+        function displayCombinedResults(result) {
+            hideLoading('combinedResults');
+            
+            const resultDiv = document.getElementById('combinedResults');
+            resultDiv.innerHTML = `
+                <h3>🚀 Generated Results</h3>
+                
+                <!-- Optimized Resume -->
+                <div class="result-section">
+                    <h4>⚡ Optimized Resume</h4>
+                    <div class="result-content" style="white-space: pre-wrap; line-height: 1.6; max-height: 300px; overflow-y: auto; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin: 15px 0;">
+                        ${result.optimizedResume || 'Resume generated successfully'}
+                    </div>
+                    <div class="download-buttons">
+                        <button class="btn btn-secondary" data-resume-content="${encodeURIComponent(result.optimizedResume || '')}" onclick="downloadGeneratedResumeAsWord(this.dataset.resumeContent)">📄 Download as Word</button>
+                        <button class="btn btn-secondary" data-resume-content="${encodeURIComponent(result.optimizedResume || '')}" onclick="downloadGeneratedResumeAsPDF(this.dataset.resumeContent)">📊 Download as PDF</button>
+                    </div>
+                </div>
+                
+                <!-- Cover Letter -->
+                <div class="result-section">
+                    <h4>✉️ Cover Letter</h4>
+                    <div class="result-content" style="white-space: pre-wrap; line-height: 1.6; max-height: 300px; overflow-y: auto; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin: 15px 0;">
+                        ${result.coverLetter || 'Cover letter generated successfully'}
+                    </div>
+                    <div class="download-buttons">
+                        <button class="btn btn-secondary" data-coverletter-content="${encodeURIComponent(result.coverLetter || '')}" onclick="downloadCoverLetterAsWord(this.dataset.coverletterContent)">📄 Download as Word</button>
+                        <button class="btn btn-secondary" data-coverletter-content="${encodeURIComponent(result.coverLetter || '')}" onclick="downloadCoverLetterAsPDF(this.dataset.coverletterContent)">📄 Download as PDF</button>
+                    </div>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+        }
+
+        // Resume Generation (moved to cover letter tab)
+        async function generateNewResume() {
+            const resumeText = document.getElementById('resumeForGeneration').value.trim();
+            const jobDesc = document.getElementById('jobDescriptionForResume').value.trim();
+            
+            if (!resumeText || !jobDesc) {
+                showNotification('Please enter both resume content and job description', 'error');
+                return;
+            }
+            
+            const generateBtn = document.querySelector('button[onclick="generateNewResume()"]');
+            if (generateBtn) {
+                generateBtn.classList.add('loading');
+                generateBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+                generateBtn.disabled = true;
+            }
+            
+            showLoading('resumeGenerationResult');
+            
+            try {
+                const response = await fetch('/api/update-resume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resumeText,
+                        jobDescription: jobDesc,
+                        generateNew: true,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Resume generation failed: ' + result.error, 'error');
+                } else {
+                    displayResumeGeneration(result);
+                }
+            } catch (error) {
+                showNotification('Resume generation failed: ' + error.message, 'error');
+                console.error('Resume generation error:', error);
+            } finally {
+                // Reset button state
+                const generateBtn = document.querySelector('button[onclick="generateNewResume()"]');
+                if (generateBtn) {
+                    generateBtn.classList.remove('loading');
+                    generateBtn.innerHTML = '⚡ Generate Tailored Resume';
+                    generateBtn.disabled = false;
+                }
+            }
+        }
+
+        function displayResumeGeneration(result) {
+            hideLoading('resumeGenerationResult');
+            
+            const resultDiv = document.getElementById('resumeGenerationResult');
+            resultDiv.innerHTML = `
+                <h3>⚡ New Generated Resume</h3>
+                <div class="result-content">
+                    <h4>Resume Tailored for Job Description</h4>
+                    <div style="white-space: pre-wrap; line-height: 1.6;">${result.optimizedResume || 'New resume generated successfully'}</div>
+                </div>
+                <div class="download-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" data-resume-content="${encodeURIComponent(result.optimizedResume || '')}" onclick="downloadGeneratedResumeAsWord(this.dataset.resumeContent)">📄 Download as Word</button>
+                    <button class="btn btn-secondary" data-resume-content="${encodeURIComponent(result.optimizedResume || '')}" onclick="downloadGeneratedResumeAsPDF(this.dataset.resumeContent)">📊 Download as PDF</button>
+                </div>
+            `;
+
+            document.getElementById('resumeGenerationResult').style.display = 'block';
+        }
+
+        // Cover Letter Generation
+        async function generateCoverLetter() {
+            const resume = document.getElementById('coverLetterResume').value.trim();
+            const jobDesc = document.getElementById('coverLetterJobDesc').value.trim();
+            
+            if (!resume || !jobDesc) {
+                showNotification('Please enter both resume summary and job description', 'error');
+                return;
+            }
+            
+            const coverLetterBtn = document.querySelector('button[onclick="generateCoverLetter()"]');
+            if (coverLetterBtn) {
+                coverLetterBtn.classList.add('loading');
+                coverLetterBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+                coverLetterBtn.disabled = true;
+            }
+            
+            showLoading('coverLetterResult');
+            
+            try {
+                const response = await fetch('/api/cover-letter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume: resume,
+                        jobDescription: jobDesc,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Cover letter generation failed: ' + result.error, 'error');
+                } else {
+                    displayCoverLetter(result);
+                }
+            } catch (error) {
+                showNotification('Cover letter generation failed: ' + error.message, 'error');
+                console.error('Cover letter error:', error);
+            } finally {
+                // Reset button state
+                const coverLetterBtn = document.querySelector('button[onclick="generateCoverLetter()"]');
+                if (coverLetterBtn) {
+                    coverLetterBtn.classList.remove('loading');
+                    coverLetterBtn.innerHTML = '✉️ Generate Cover Letter';
+                    coverLetterBtn.disabled = false;
+                }
+            }
+        }
+
+        function displayCoverLetter(result) {
+            hideLoading('coverLetterResult');
+            const content = result.coverLetter || 'Cover letter generated successfully';
+            document.getElementById('coverLetterContent').innerHTML = content.replace(/\n/g, '<br>');
+            document.getElementById('coverLetterResult').style.display = 'block';
+        }
+
+        // Interview Preparation
+        async function generateInterviewQuestions() {
+            const role = document.getElementById('interviewRole').value.trim();
+            if (!role) {
+                showNotification('Please enter the target role', 'error');
+                return;
+            }
+            
+            const interviewBtn = document.querySelector('button[onclick="generateInterviewQuestions()"]');
+            if (interviewBtn) {
+                interviewBtn.classList.add('loading');
+                interviewBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+                interviewBtn.disabled = true;
+            }
+            
+            showLoading('interviewResult');
+            
+            try {
+                const response = await fetch('/api/interview-prep', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        role: role,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Failed to generate questions: ' + result.error, 'error');
+                } else {
+                    displayInterviewQuestions(result);
+                }
+            } catch (error) {
+                showNotification('Failed to generate questions: ' + error.message, 'error');
+                console.error('Interview prep error:', error);
+            } finally {
+                // Reset button state
+                const interviewBtn = document.querySelector('button[onclick="generateInterviewQuestions()"]');
+                if (interviewBtn) {
+                    interviewBtn.classList.remove('loading');
+                    interviewBtn.innerHTML = '❓ Get Questions';
+                    interviewBtn.disabled = false;
+                }
+            }
+        }
+
+        function displayInterviewQuestions(result) {
+            hideLoading('interviewResult');
+            
+            const resultDiv = document.getElementById('interviewResult');
+            const questions = result.questions || 'Questions generated successfully';
+            resultDiv.innerHTML = `
+                <h3>❓ Interview Questions for ${document.getElementById('interviewRole').value}</h3>
+                <div class="result-content">
+                    <p>${questions.replace(/\n/g, '<br>')}</p>
+                </div>
+            `;
+
+            document.getElementById('interviewResult').style.display = 'block';
+        }
+
+
+
+
+
+
+
+        // Career Planning
+        async function generateCareerPlan() {
+            const currentRole = document.getElementById('currentRole').value.trim();
+            const targetRole = document.getElementById('targetRole').value.trim();
+            const experience = document.getElementById('experience').value.trim();
+            
+            if (!currentRole || !targetRole || !experience) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            showLoading('careerPlanResult');
+            
+            try {
+                const response = await fetch('/api/career-planning', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userToken ? `Bearer ${userToken}` : ''
+                    },
+                    body: JSON.stringify({
+                        currentRole: currentRole,
+                        targetRole: targetRole,
+                        experience: experience,
+                        userId: currentUser ? currentUser.id : 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Career plan generation failed: ' + result.error, 'error');
+                } else {
+                    displayCareerPlan(result);
+                }
+            } catch (error) {
+                showNotification('Career plan generation failed: ' + error.message, 'error');
+                console.error('Career planning error:', error);
+            }
+        }
+
+        function displayCareerPlan(result) {
+            hideLoading('careerPlanResult');
+            const content = result.plan || 'Career plan generated successfully';
+            document.getElementById('careerPlanResult').innerHTML = `
+                <h3>🎯 Career Development Plan</h3>
+                <div class="result-content">
+                    <p>${content.replace(/\n/g, '<br>')}</p>
+                </div>
+            `;
+            document.getElementById('careerPlanResult').style.display = 'block';
+        }
+
+        // Utility functions
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>Processing your request...</div>';
+                element.style.display = 'block';
+            }
+        }
+
+        function hideLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                // Don't clear innerHTML for interview container and results to preserve the UI
+                if (elementId === 'interviewContainer' || elementId === 'interviewResults') {
+                    element.style.display = 'block';
+                } else {
+                    element.innerHTML = '';
+                    element.style.display = 'block';
+                }
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Download functions for Word and PDF
+        async function downloadResumeAsWord() {
+            const resumeContent = document.getElementById('resumeResult').innerText;
+            if (!resumeContent) {
+                showNotification('No resume content to download', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/download-resume-word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: resumeContent,
+                        title: 'Resume_Analysis'
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Resume_Analysis.docx';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    showNotification('Download failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Download failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function downloadGeneratedResumeAsWord(content) {
+            console.log('downloadGeneratedResumeAsWord called with content:', content);
+            
+            if (!content) {
+                showNotification('No resume content to download', 'error');
+                return;
+            }
+            
+            // Decode the URI-encoded content
+            const decodedContent = decodeURIComponent(content);
+            console.log('Decoded content length:', decodedContent.length);
+            console.log('First 100 chars:', decodedContent.substring(0, 100));
+            
+            try {
+                console.log('Sending request to /api/download-resume-word');
+                const response = await fetch('/api/download-resume-word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: decodedContent,
+                        title: 'Generated_Resume'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    console.log('Blob received:', blob);
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Generated_Resume.docx';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showNotification('Resume downloaded successfully!', 'success');
+                } else {
+                    const errorText = await response.text();
+                    console.error('Download failed with status:', response.status, 'Error:', errorText);
+                    showNotification('Server download failed, trying client-side generation...', 'info');
+                    
+                    // Try client-side generation as fallback
+                    const success = await generateWordDocumentClientSide(decodedContent, 'Generated_Resume');
+                    if (!success) {
+                        showNotification('Both server and client-side Word generation failed', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('Server download failed, trying client-side generation...', 'info');
+                
+                // Try client-side generation as fallback
+                const success = await generateWordDocumentClientSide(decodedContent, 'Generated_Resume');
+                if (!success) {
+                    showNotification('Both server and client-side Word generation failed', 'error');
+                }
+            }
+        }
+
+        async function downloadResumeAsPDF() {
+            const resumeContent = document.getElementById('resumeResult').innerText;
+            if (!resumeContent) {
+                showNotification('No resume content to download', 'error');
+                return;
+            }
+            
+            // Use jsPDF for PDF generation
+            if (typeof jsPDF !== 'undefined') {
+                const { jsPDF } = window.jsPDF;
+                const doc = new jsPDF();
+                doc.text(resumeContent, 20, 20);
+                doc.save('Resume_Analysis.pdf');
+            } else {
+                showNotification('PDF generation not available', 'error');
+            }
+        }
+        
+        async function downloadGeneratedResumeAsPDF(content) {
+            console.log('downloadGeneratedResumeAsPDF called with content:', content);
+            
+            if (!content) {
+                showNotification('No resume content to download', 'error');
+                return;
+            }
+            
+            // Decode the URI-encoded content
+            const decodedContent = decodeURIComponent(content);
+            console.log('Decoded content length:', decodedContent.length);
+            console.log('First 100 chars:', decodedContent.substring(0, 100));
+            
+            try {
+                console.log('Sending request to /api/download-resume-pdf');
+                const response = await fetch('/api/download-resume-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: decodedContent
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    console.log('Blob received:', blob);
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Generated_Resume.pdf';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showNotification('Resume PDF downloaded successfully!', 'success');
+                } else {
+                    const errorText = await response.text();
+                    console.error('Download failed with status:', response.status, 'Error:', errorText);
+                    showNotification('Server download failed, trying client-side generation...', 'info');
+                    
+                    // Try client-side generation as fallback
+                    const success = await generatePDFDocumentClientSide(decodedContent, 'Generated_Resume');
+                    if (!success) {
+                        showNotification('Both server and client-side PDF generation failed', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('Server download failed, trying client-side generation...', 'info');
+                
+                // Try client-side generation as fallback
+                const success = await generatePDFDocumentClientSide(decodedContent, 'Generated_Resume');
+                if (!success) {
+                    showNotification('Both server and client-side PDF generation failed', 'error');
+                }
+            }
+        }
+
+        async function downloadCoverLetterAsWord(content) {
+            if (!content) {
+                showNotification('No cover letter content to download', 'error');
+                return;
+            }
+            
+            // Decode the URI-encoded content
+            const decodedContent = decodeURIComponent(content);
+            
+            try {
+                const response = await fetch('/api/download-coverletter-word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: decodedContent,
+                        title: 'Cover_Letter'
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Cover_Letter.docx';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showNotification('Cover letter downloaded successfully!', 'success');
+                } else {
+                    showNotification('Server download failed, trying client-side generation...', 'info');
+                    
+                    // Try client-side generation as fallback
+                    const success = await generateWordDocumentClientSide(decodedContent, 'Cover_Letter');
+                    if (!success) {
+                        showNotification('Both server and client-side Word generation failed', 'error');
+                    }
+                }
+            } catch (error) {
+                showNotification('Server download failed, trying client-side generation...', 'info');
+                
+                // Try client-side generation as fallback
+                const success = await generateWordDocumentClientSide(decodedContent, 'Cover_Letter');
+                if (!success) {
+                    showNotification('Both server and client-side Word generation failed', 'error');
+                }
+            }
+        }
+
+        async function downloadCoverLetterAsPDF(content) {
+            if (!content) {
+                showNotification('No cover letter content to download', 'error');
+                return;
+            }
+            
+            // Decode the URI-encoded content
+            const decodedContent = decodeURIComponent(content);
+            
+            try {
+                const response = await fetch('/api/download-coverletter-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: decodedContent
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Cover_Letter.pdf';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showNotification('Cover letter PDF downloaded successfully!', 'success');
+                } else {
+                    showNotification('Server download failed, trying client-side generation...', 'info');
+                    
+                    // Try client-side generation as fallback
+                    const success = await generatePDFDocumentClientSide(decodedContent, 'Cover_Letter');
+                    if (!success) {
+                        showNotification('Both server and client-side PDF generation failed', 'error');
+                    }
+                }
+            } catch (error) {
+                showNotification('Server download failed, trying client-side generation...', 'info');
+                
+                // Try client-side generation as fallback
+                const success = await generatePDFDocumentClientSide(decodedContent, 'Cover_Letter');
+                if (!success) {
+                    showNotification('Both server and client-side PDF generation failed', 'error');
+                }
+            }
+        }
+
+        // Interactive interview functionality
+        let currentInterviewQuestions = [];
+        let currentQuestionIndex = 0;
+        let interviewAnswers = [];
+        let interviewFeedback = [];
+
+        function startInteractiveInterview() {
+            console.log('Starting interactive interview...');
+            const role = document.getElementById('interviewRole').value.trim();
+            const jobDesc = document.getElementById('interviewJobDesc').value.trim();
+            
+            if (!role && !jobDesc) {
+                showNotification('Please enter a role or job description', 'error');
+                return;
+            }
+            
+            console.log('Role:', role, 'Job Description:', jobDesc);
+            
+            // Generate interview questions based on job description
+            generateInterviewQuestionsForInteractive();
+        }
+
+        async function generateInterviewQuestionsForInteractive() {
+            const role = document.getElementById('interviewRole').value.trim();
+            const jobDesc = document.getElementById('interviewJobDesc').value.trim();
+            
+            if (!role && !jobDesc) {
+                showNotification('Please enter a role or job description', 'error');
+                return;
+            }
+            
+            showLoading('interviewContainer');
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                const response = await fetch('/api/interview-prep', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        role: role,
+                        jobDescription: jobDesc,
+                        type: 'interactive',
+                        userId: 'guest-user'
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    showNotification('Failed to generate questions: ' + result.error, 'error');
+                } else {
+                    // Parse questions and filter out empty lines
+                    const questionsText = result.questions || '';
+                    console.log('Raw questions from API:', questionsText);
+                    
+                    currentInterviewQuestions = questionsText
+                        .split('\n')
+                        .map(q => q.trim())
+                        .filter(q => q && q.length > 0) // Only filter empty lines, keep all valid questions
+                        .slice(0, 7); // Limit to 7 questions
+                    
+                    console.log('Parsed questions:', currentInterviewQuestions);
+                    
+                    if (currentInterviewQuestions.length === 0) {
+                        console.log('No questions from API, using fallback questions');
+                        // Fallback questions if API doesn't return valid ones
+                        currentInterviewQuestions = [
+                            "Tell me about a challenging project you worked on and how you overcame obstacles.",
+                            "Describe a time when you had to learn a new technology quickly. How did you approach it?",
+                            "How do you handle working with difficult team members or stakeholders?",
+                            "What's your approach to debugging and problem-solving?",
+                            "Describe a situation where you had to make a decision with incomplete information.",
+                            "How do you stay updated with industry trends and new technologies?",
+                            "Tell me about a time when you had to explain a complex technical concept to a non-technical person."
+                        ];
+                    }
+                    
+                    currentQuestionIndex = 0;
+                    interviewAnswers = [];
+                    interviewFeedback = [];
+                    
+                    // Hide any existing interview results
+                    const interviewResult = document.getElementById('interviewResult');
+                    if (interviewResult) {
+                        interviewResult.style.display = 'none';
+                    }
+                    
+                    // Show the interview container first
+                    const interviewContainer = document.getElementById('interviewContainer');
+                    const interviewResults = document.getElementById('interviewResults');
+                    
+                    console.log('Interview container found:', !!interviewContainer);
+                    console.log('Interview results found:', !!interviewResults);
+                    
+                    if (interviewContainer) {
+                        interviewContainer.style.display = 'block';
+                        console.log('Interview container displayed');
+                        
+                        // Force refresh the container content to ensure elements exist
+                        interviewContainer.innerHTML = `
+                            <h3>🎭 Interactive Interview Session</h3>
+                            
+                            <!-- Question Display -->
+                            <div id="currentQuestion" class="question-display" style="margin-bottom: 30px;"></div>
+                            
+                            <!-- Answer Input Section -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                <label for="userAnswer" style="font-size: 16px; font-weight: bold; margin-bottom: 10px; display: block; color: #fff;">
+                                    🎯 Your Answer:
+                                </label>
+                                <textarea 
+                                    id="userAnswer" 
+                                    rows="6" 
+                                    placeholder="Type your detailed answer here or use voice input below... Speak clearly and provide specific examples!"
+                                    style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 14px; resize: vertical;"
+                                ></textarea>
+                                
+                                <!-- Voice Input Controls -->
+                                <div class="voice-input-container" style="margin-top: 15px; text-align: center;">
+                                    <button id="voiceInputBtn" class="voice-input-btn" onclick="startVoiceInput()" style="margin-right: 10px;">
+                                        🎤 Start Voice Input
+                                    </button>
+                                    <button id="stopVoiceBtn" class="voice-input-btn" onclick="stopVoiceInput()" style="display: none; background: #ff6b6b;">
+                                        ⏹️ Stop Recording
+                                    </button>
+                                    <div id="voiceStatus" style="color: #b8b8b8; font-size: 14px; margin-top: 10px; font-style: italic;"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="form-group" style="text-align: center; margin-bottom: 25px;">
+                                <button class="btn" onclick="submitAnswer()" style="margin-right: 15px; padding: 12px 25px; font-size: 16px;">
+                                    📝 Submit Answer & Continue
+                                </button>
+                                <button class="btn btn-secondary" onclick="skipQuestion()" style="margin-right: 15px; padding: 12px 25px; font-size: 16px;">
+                                    ⏭️ Skip Question
+                                </button>
+                                <button class="btn" onclick="speakLastQuestion()" style="padding: 12px 25px; font-size: 16px;">
+                                    🔊 Repeat Question
+                                </button>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div id="interviewProgress" style="margin-bottom: 25px;"></div>
+                            
+                            <!-- Current Answer Preview -->
+                            <div id="answerPreview" style="margin-top: 20px; padding: 20px; background: rgba(76, 175, 80, 0.1); border-radius: 15px; border-left: 4px solid #4caf50; display: none;">
+                                <h4 style="color: #4caf50; margin-bottom: 15px;">📝 Answer Preview:</h4>
+                                <div id="answerPreviewText" style="white-space: pre-wrap; line-height: 1.6; color: #fff; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px;"></div>
+                            </div>
+                            
+                            <!-- Instructions -->
+                            <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border-left: 4px solid #667eea;">
+                                <h4 style="color: #667eea; margin-bottom: 15px;">💡 Interview Tips:</h4>
+                                <ul style="color: #b8b8b8; line-height: 1.6; margin-left: 20px;">
+                                    <li>Take your time to think before answering</li>
+                                    <li>Use specific examples from your experience</li>
+                                    <li>Speak clearly and confidently</li>
+                                    <li>You can edit your answer before submitting</li>
+                                    <li>Use voice input for natural responses</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Interview Results (Hidden initially) -->
+                            <div id="interviewResults" class="result-container" style="display: none; position: relative; z-index: 1000; background: rgba(0, 0, 0, 0.9); border: 2px solid #667eea; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);">
+                                <h3 style="color: #667eea; text-align: center; margin-bottom: 20px;">📊 Interview Performance Summary</h3>
+                                <div id="interviewFeedback" style="min-height: 100px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin: 20px 0; color: #fff; line-height: 1.6;"></div>
+                                <div class="form-group" style="margin-top: 20px; text-align: center;">
+                                    <button class="btn" onclick="downloadInterviewReport()">📄 Download Report</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Loading Area (Separate from results) -->
+                            <div id="interviewLoading" class="loading" style="display: none; text-align: center; padding: 40px; color: #b8b8b8;">
+                                <div class="loading-text">
+                                    <span class="loading-spinner"></span>Processing your request...
+                                </div>
+                            </div>
+                        `;
+                        
+                        console.log('Interview container content refreshed');
+                    }
+                    
+                    if (interviewResults) {
+                        interviewResults.style.display = 'none';
+                    }
+                    
+                    // Show the first question with answer input interface
+                    showInteractiveQuestion();
+                    
+                    showNotification(`Interactive interview started with ${currentInterviewQuestions.length} questions!`, 'success');
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    showNotification('Request timed out. Please try again.', 'error');
+                } else {
+                    showNotification('Failed to generate questions: ' + error.message, 'error');
+                }
+                console.error('Interview prep error:', error);
+                
+                // Hide loading and show error
+                const interviewContainer = document.getElementById('interviewContainer');
+                if (interviewContainer) {
+                    interviewContainer.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <h4>❌ Error Loading Interview</h4>
+                            <p>Failed to load interview questions. Please try again.</p>
+                            <button class="btn" onclick="startInteractiveInterview()">🔄 Retry</button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function showInteractiveQuestion() {
+            console.log('Showing interactive question:', currentQuestionIndex, 'of', currentInterviewQuestions.length);
+            
+            // Hide loading state first
+            hideLoading('interviewContainer');
+            
+            if (currentQuestionIndex >= currentInterviewQuestions.length) {
+                completeInteractiveInterview();
+                return;
+            }
+            
+            const question = currentInterviewQuestions[currentQuestionIndex];
+            const currentQuestionElement = document.getElementById('currentQuestion');
+            const interviewProgressElement = document.getElementById('interviewProgress');
+            const userAnswerElement = document.getElementById('userAnswer');
+            const answerPreview = document.getElementById('answerPreview');
+            
+            console.log('Question:', question);
+            console.log('Elements found:', {
+                currentQuestion: !!currentQuestionElement,
+                interviewProgress: !!interviewProgressElement,
+                userAnswer: !!userAnswerElement,
+                answerPreview: !!answerPreview
+            });
+            
+            // Debug: Check if elements exist in DOM
+            console.log('DOM check - currentQuestion:', document.getElementById('currentQuestion'));
+            console.log('DOM check - userAnswer:', document.getElementById('userAnswer'));
+            console.log('DOM check - interviewProgress:', document.getElementById('interviewProgress'));
+            console.log('DOM check - answerPreview:', document.getElementById('answerPreview'));
+            
+            if (currentQuestionElement) {
+                currentQuestionElement.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                            <h4 style="color: #fff; margin: 0; font-size: 18px;">Question ${currentQuestionIndex + 1} of ${currentInterviewQuestions.length}</h4>
+                        </div>
+                        <div style="padding: 30px; background: rgba(255, 255, 255, 0.08); border-radius: 20px; border: 2px solid #667eea; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
+                            <p style="font-size: 18px; line-height: 1.8; margin: 0; color: #fff; font-weight: 500;">${question}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Speak the question
+            speakText(question, 'interview');
+            
+            // Update progress
+            if (interviewProgressElement) {
+                interviewProgressElement.innerHTML = `
+                    <div style="text-align: center; margin-top: 20px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                        <div style="color: #fff; margin-bottom: 15px; font-size: 16px; font-weight: bold;">📊 Interview Progress: ${currentQuestionIndex + 1} of ${currentInterviewQuestions.length}</div>
+                        <div style="width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-top: 10px; overflow: hidden;">
+                            <div style="width: ${((currentQuestionIndex + 1) / currentInterviewQuestions.length) * 100}%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 6px; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);"></div>
+                        </div>
+                        <div style="color: #b8b8b8; margin-top: 10px; font-size: 14px;">
+                            ${Math.round(((currentQuestionIndex + 1) / currentInterviewQuestions.length) * 100)}% Complete
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Ensure the answer input section is visible and properly styled
+            if (userAnswerElement) {
+                userAnswerElement.value = '';
+                userAnswerElement.style.display = 'block';
+                userAnswerElement.focus(); // Auto-focus on answer input
+                
+                // Make sure the parent form-group is visible
+                const formGroup = userAnswerElement.closest('.form-group');
+                if (formGroup) {
+                    formGroup.style.display = 'block';
+                }
+            }
+            
+            // Ensure voice input controls are visible
+            const voiceInputContainer = document.querySelector('.voice-input-container');
+            if (voiceInputContainer) {
+                voiceInputContainer.style.display = 'block';
+            }
+            
+            // Ensure action buttons are visible
+            const actionButtons = document.querySelector('.form-group[style*="text-align: center"]');
+            if (actionButtons) {
+                actionButtons.style.display = 'block';
+            }
+            
+            // Hide previous answer preview
+            if (answerPreview) {
+                answerPreview.style.display = 'none';
+            }
+            
+            // Update submit button text
+            const submitBtn = document.querySelector('button[onclick="submitAnswer()"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = currentQuestionIndex === currentInterviewQuestions.length - 1 ? '🏁 Finish Interview' : '📝 Submit Answer & Continue';
+            }
+            
+            console.log('Interview UI elements should now be visible');
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('userAnswer').value.trim();
+            if (!answer) {
+                showNotification('Please provide an answer', 'error');
+                return;
+            }
+            
+            interviewAnswers.push({
+                question: currentInterviewQuestions[currentQuestionIndex],
+                answer: answer
+            });
+            
+            currentQuestionIndex++;
+            showInteractiveQuestion();
+        }
+
+        function skipQuestion() {
+            interviewAnswers.push({
+                question: currentInterviewQuestions[currentQuestionIndex],
+                answer: 'Skipped'
+            });
+            
+            currentQuestionIndex++;
+            showInteractiveQuestion();
+        }
+
+        function speakLastQuestion() {
+            if (currentQuestionIndex < currentInterviewQuestions.length) {
+                const question = currentInterviewQuestions[currentQuestionIndex];
+                speakText(question, 'interview');
+            }
+        }
+
+        async function completeInteractiveInterview() {
+            console.log('Completing interactive interview...');
+            console.log('Interview answers:', interviewAnswers);
+            
+            // Don't hide the entire container, just the question section
+            const questionSection = document.getElementById('currentQuestion');
+            const answerSection = document.getElementById('userAnswer');
+            const voiceSection = document.getElementById('voiceInputBtn').parentElement;
+            const progressSection = document.getElementById('interviewProgress');
+            const actionButtons = document.querySelector('.form-group:has(.btn)');
+            
+            console.log('Hiding question sections:', {
+                questionSection: !!questionSection,
+                answerSection: !!answerSection,
+                voiceSection: !!voiceSection,
+                progressSection: !!progressSection,
+                actionButtons: !!actionButtons
+            });
+            
+            if (questionSection) questionSection.style.display = 'none';
+            if (answerSection) answerSection.parentElement.style.display = 'none';
+            if (voiceSection) voiceSection.style.display = 'none';
+            if (progressSection) progressSection.style.display = 'none';
+            if (actionButtons) actionButtons.style.display = 'none';
+            
+            // Check if interviewResults exists before showing loading
+            const resultsContainer = document.getElementById('interviewResults');
+            const loadingContainer = document.getElementById('interviewLoading');
+            console.log('Results container before loading:', resultsContainer);
+            console.log('Loading container:', loadingContainer);
+            
+            if (resultsContainer && loadingContainer) {
+                // Show loading in separate area, not in results
+                loadingContainer.style.display = 'block';
+                resultsContainer.style.display = 'none'; // Keep results hidden until ready
+            } else {
+                console.error('Required containers not found!');
+                showNotification('Error: Required containers not found', 'error');
+                return;
+            }
+            
+            try {
+                // Generate comprehensive AI feedback
+                console.log('Generating AI feedback...');
+                const feedback = await generateInterviewFeedback(interviewAnswers);
+                console.log('Feedback generated:', feedback);
+                displayInterviewResults({ feedback });
+            } catch (error) {
+                showNotification('Failed to generate feedback: ' + error.message, 'error');
+                console.error('Interview feedback error:', error);
+            }
+        }
+
+        async function generateInterviewFeedback(answers) {
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Please provide comprehensive feedback on these interview answers. For each answer, give specific feedback on:
+                        1. Content quality and relevance
+                        2. Communication clarity
+                        3. Specific strengths
+                        4. Areas for improvement
+                        5. Overall interview performance score (1-100)
+                        
+                        Interview Answers:
+                        ${answers.map((answer, index) => `Question ${index + 1}: ${answer.question}\nAnswer: ${answer.answer}`).join('\n\n')}
+                        
+                        Please provide structured, actionable feedback.`,
+                        userId: 'guest-user'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                return result.response || 'Feedback generated successfully.';
+            } catch (error) {
+                console.error('Feedback generation error:', error);
+                return 'Failed to generate AI feedback. Here are your answers for review:\n\n' + 
+                       answers.map((answer, index) => `Question ${index + 1}: ${answer.question}\nAnswer: ${answer.answer}`).join('\n\n');
+            }
+        }
+
+        function displayInterviewResults(result) {
+            console.log('Displaying interview results:', result);
+            
+            const feedback = result.feedback || result.questions || 'Interview feedback generated successfully';
+            const feedbackElement = document.getElementById('interviewFeedback');
+            const resultsElement = document.getElementById('interviewResults');
+            const loadingElement = document.getElementById('interviewLoading');
+            
+            console.log('Elements found:', {
+                feedback: feedbackElement,
+                results: resultsElement,
+                loading: loadingElement,
+                feedbackText: feedback
+            });
+            
+            // Hide loading first
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+                console.log('Loading hidden');
+            }
+            
+            if (feedbackElement && resultsElement) {
+                // Set the feedback content
+                feedbackElement.innerHTML = feedback.replace(/\n/g, '<br>');
+                
+                // Make sure the results container is visible
+                resultsElement.style.display = 'block';
+                resultsElement.style.visibility = 'visible';
+                resultsElement.style.opacity = '1';
+                
+                // Force a reflow to ensure visibility
+                resultsElement.offsetHeight;
+                
+                console.log('Interview results displayed successfully');
+                console.log('Results container style:', resultsElement.style.display, resultsElement.style.visibility, resultsElement.style.opacity);
+                
+                // Also show a notification
+                showNotification('Interview feedback generated! Check the results below.', 'success');
+                
+                // Scroll to the results if needed
+                resultsElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Additional debugging - check if content is actually there
+                setTimeout(() => {
+                    console.log('Content check after 1 second:');
+                    console.log('Feedback element content:', feedbackElement.innerHTML);
+                    console.log('Results element display:', resultsElement.style.display);
+                    console.log('Results element visibility:', resultsElement.style.visibility);
+                    console.log('Results element opacity:', resultsElement.style.opacity);
+                    console.log('Results element offsetHeight:', resultsElement.offsetHeight);
+                }, 1000);
+                
+            } else {
+                console.error('Interview results elements not found:', {
+                    feedback: !!feedbackElement,
+                    results: !!resultsElement
+                });
+                
+                // Try to find the container again
+                const container = document.querySelector('#interviewResults');
+                if (container) {
+                    console.log('Found container, trying to show it');
+                    container.style.display = 'block';
+                    container.innerHTML = `
+                        <h3>📊 Interview Performance Summary</h3>
+                        <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin: 20px 0;">
+                            ${feedback.replace(/\n/g, '<br>')}
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <button class="btn" onclick="downloadInterviewReport()">📄 Download Report</button>
+                        </div>
+                    `;
+                }
+                
+                // Fallback: show feedback in a notification
+                showNotification('Interview completed! Check the results section below.', 'success');
+            }
+        }
+
+        // Job search functions
+        function clearJobFilters() {
+            document.getElementById('jobTitle').value = '';
+            document.getElementById('jobLocation').value = '';
+            document.getElementById('jobType').value = '';
+            document.getElementById('experienceLevel').value = '';
+        }
+
+        // Load real-time market insights
+        function loadMarketInsights() {
+            // Update insights every 30 seconds
+            updateMarketInsights();
+            setInterval(updateMarketInsights, 30000);
+        }
+
+        async function updateMarketInsights() {
+            try {
+                const response = await fetch('/api/job-analytics', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        query: 'general',
+                        userId: 'guest-user'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.error) {
+                    // Get all market insight elements with null checks
+                    const elements = {
+                        hotSkills: document.getElementById('hotSkills'),
+                        avgSalary: document.getElementById('avgSalary'),
+                        marketTrend: document.getElementById('marketTrend'),
+                        remoteJobs: document.getElementById('remoteJobs'),
+                        activeJobs: document.getElementById('activeJobs'),
+                        growthRate: document.getElementById('growthRate')
+                    };
+                    
+                    // Update elements only if they exist
+                    if (elements.hotSkills) {
+                        elements.hotSkills.textContent = result.topSkills ? result.topSkills.join(', ') : 'Loading...';
+                    }
+                    if (elements.avgSalary) {
+                        elements.avgSalary.textContent = result.averageSalary || 'Loading...';
+                    }
+                    if (elements.marketTrend) {
+                        elements.marketTrend.textContent = result.marketTrend || 'Loading...';
+                    }
+                    if (elements.remoteJobs) {
+                        elements.remoteJobs.textContent = result.growthRate || 'Loading...';
+                    }
+                    if (elements.activeJobs) {
+                        elements.activeJobs.textContent = result.jobCount || 'Loading...';
+                    }
+                    if (elements.growthRate) {
+                        elements.growthRate.textContent = result.growthRate || 'Loading...';
+                    }
+                }
+            } catch (error) {
+                console.error('Market insights error:', error);
+            }
+        }
+
+        // Enhanced job search functions
+        function clearJobFilters() {
+            document.getElementById('jobTitle').value = '';
+            document.getElementById('jobLocation').value = '';
+            document.getElementById('jobType').value = '';
+            document.getElementById('experienceLevel').value = '';
+            document.getElementById('salaryRange').value = '';
+        }
+
+        function refreshMarketData() {
+            updateMarketInsights();
+            showNotification('Market data refreshed!', 'success');
+        }
+
+        async function searchJobs() {
+            console.log('searchJobs function called');
+            
+            const jobTitle = document.getElementById('jobTitle').value.trim();
+            const location = document.getElementById('jobLocation').value.trim();
+            const jobType = document.getElementById('jobType').value;
+            const experienceLevel = document.getElementById('experienceLevel').value;
+            const salaryRange = document.getElementById('salaryRange').value;
+
+            console.log('Search parameters:', { jobTitle, location, jobType, experienceLevel, salaryRange });
+
+            if (!jobTitle && !location) {
+                showNotification('Please enter at least a job title or location', 'error');
+                return;
+            }
+
+            showLoading('jobResults');
+            
+            try {
+                console.log('Sending request to /api/job-search');
+                const response = await fetch('/api/job-search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jobTitle,
+                        location,
+                        jobType,
+                        experienceLevel,
+                        salaryRange,
+                        userId: 'guest-user'
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response result:', result);
+                
+                if (result.error) {
+                    showNotification('Job search failed: ' + result.error, 'error');
+                } else {
+                    console.log('Calling displayJobResults with:', result.jobs || []);
+                    displayJobResults(result.jobs || []);
+                }
+            } catch (error) {
+                showNotification('Job search failed: ' + error.message, 'error');
+                console.error('Job search error:', error);
+            }
+        }
+
+        function displayJobResults(jobs) {
+            console.log('displayJobResults called with jobs:', jobs);
+            hideLoading('jobResults');
+            
+            // Wait for DOM to be ready
+            if (document.readyState !== 'complete') {
+                console.log('DOM not ready, waiting...');
+                setTimeout(() => displayJobResults(jobs), 100);
+                return;
+            }
+            
+            // Check if job search tab is active
+            const jobSearchTab = document.getElementById('jobSearch');
+            if (!jobSearchTab || !jobSearchTab.classList.contains('active')) {
+                console.log('Job search tab not active, switching to it first');
+                // Find and click the job search tab
+                const jobSearchTabButton = document.querySelector('.tab[onclick*="jobSearch"]');
+                if (jobSearchTabButton) {
+                    jobSearchTabButton.click();
+                    // Wait a bit for the tab to switch, then try again
+                    setTimeout(() => displayJobResults(jobs), 200);
+                    return;
+                }
+            }
+            
+            // Get required elements with null checks
+            const jobResults = document.getElementById('jobResults');
+            const jobList = document.getElementById('jobList');
+            const jobCount = document.getElementById('jobCount');
+            
+            console.log('Found elements:', {
+                jobResults: !!jobResults,
+                jobList: !!jobList,
+                jobCount: !!jobCount
+            });
+            
+            // Make sure jobResults container is visible first
+            if (jobResults) {
+                jobResults.style.display = 'block';
+            }
+            
+            // Check if all required elements exist
+            if (!jobResults || !jobList || !jobCount) {
+                console.error('Required job elements not found:', {
+                    jobResults: !!jobResults,
+                    jobList: !!jobList,
+                    jobCount: !!jobCount
+                });
+                
+                // If jobResults exists but children don't, recreate the entire structure
+                if (jobResults) {
+                    console.log('Recreating job results structure');
+                    jobResults.innerHTML = `
+                        <div class="job-results-header">
+                            <h3>📋 Job Results</h3>
+                            <div class="job-count" id="jobCount" style="display: block; padding: 10px; font-weight: bold;">0 jobs found</div>
+                        </div>
+                        <div class="job-list" id="jobList" style="display: block; min-height: 100px;"></div>
+                    `;
+                } else {
+                    showNotification('Error: Job display container not found', 'error');
+                    return;
+                }
+            }
+            
+            // Get the final elements (either original or newly created)
+            const finalJobResults = document.getElementById('jobResults');
+            const finalJobList = document.getElementById('jobList');
+            const finalJobCount = document.getElementById('jobCount');
+            
+            if (!jobs || jobs.length === 0) {
+                currentJobResults = []; // Clear job data
+                if (finalJobResults) {
+                    finalJobResults.innerHTML = `
+                        <div class="no-results">
+                            <h3>🔍 No jobs found</h3>
+                            <p>Try adjusting your search criteria or check back later for new opportunities.</p>
+                        </div>
+                    `;
+                    finalJobResults.style.display = 'block';
+                }
+                return;
+            }
+
+            // Store job data globally for action functions
+            currentJobResults = jobs;
+            
+            if (finalJobCount) {
+                finalJobCount.textContent = `${jobs.length} job${jobs.length !== 1 ? 's' : ''} found`;
+            }
+            
+            const jobsHTML = jobs.map((job, index) => `
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">${job.title}</h3>
+                        <div class="job-company">${job.company}</div>
+                        <div class="job-location">📍 ${job.location}</div>
+                    </div>
+                    <div class="job-details">
+                        <div class="job-type">${job.type}</div>
+                        <div class="job-salary">💰 ${job.salary || 'Salary not specified'}</div>
+                        <div class="job-experience">📊 ${job.experienceLevel}</div>
+                    </div>
+                    <div class="job-description">${job.description}</div>
+                    <div class="job-actions">
+                        <button class="btn btn-outline" onclick="viewJobDetails(${index})">👁️ View Details</button>
+                        <button class="btn" onclick="applyToJob(${index})">📝 Apply Now</button>
+                        <button class="btn btn-secondary" onclick="saveJob(${index})">💾 Save Job</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            finalJobList.innerHTML = jobsHTML;
+            finalJobResults.style.display = 'block';
+            finalJobResults.style.visibility = 'visible';
+            finalJobResults.style.opacity = '1';
+            
+            // Force the elements to be visible
+            if (finalJobList) {
+                finalJobList.style.display = 'block';
+                finalJobList.style.visibility = 'visible';
+            }
+            if (finalJobCount) {
+                finalJobCount.style.display = 'block';
+                finalJobCount.style.visibility = 'visible';
+            }
+            
+            console.log('Job results displayed successfully!');
+            console.log('Jobs HTML length:', jobsHTML.length);
+            console.log('Final elements check:', {
+                finalJobResults: !!finalJobResults,
+                finalJobList: !!finalJobList,
+                finalJobCount: !!finalJobCount,
+                jobsCount: jobs.length,
+                jobResultsDisplay: finalJobResults?.style.display,
+                jobListDisplay: finalJobList?.style.display,
+                jobCountDisplay: finalJobCount?.style.display
+            });
+            
+            // Scroll to the results
+            finalJobResults.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Store job data globally for access by action functions
+        let currentJobResults = [];
+
+        function viewJobDetails(index) {
+            if (!currentJobResults[index]) {
+                showNotification('Job details not available', 'error');
+                return;
+            }
+            
+            const job = currentJobResults[index];
+            
+            // Create and show detailed job modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 10000; display: flex; 
+                align-items: center; justify-content: center; padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a2e; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00d4ff; margin: 0;">${job.title}</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="color: #ff6b6b; margin-bottom: 5px;">🏢 ${job.company}</h3>
+                        <p style="margin: 5px 0;"><strong>📍 Location:</strong> ${job.location}</p>
+                        <p style="margin: 5px 0;"><strong>💼 Type:</strong> ${job.type}</p>
+                        <p style="margin: 5px 0;"><strong>💰 Salary:</strong> ${job.salary || 'Competitive'}</p>
+                        <p style="margin: 5px 0;"><strong>📊 Experience:</strong> ${job.experienceLevel}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 10px;">Job Description:</h4>
+                        <p style="line-height: 1.6; color: #e8e8e8;">${job.description}</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="applyToJob(${index})" style="background: #00d4ff; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold;">📝 Apply Now</button>
+                        <button onclick="saveJob(${index})" style="background: #4ecdc4; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 Save Job</button>
+                        <button onclick="copyJobLink(${index})" style="background: #ff6b6b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold;">🔗 Share</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function applyToJob(index) {
+            if (!currentJobResults[index]) {
+                showNotification('Job information not available', 'error');
+                return;
+            }
+            
+            const job = currentJobResults[index];
+            
+            // Create application modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 10000; display: flex; 
+                align-items: center; justify-content: center; padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a2e; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00d4ff; margin: 0;">Apply to ${job.company}</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ff6b6b;">${job.title}</h3>
+                        <p style="color: #b8b8b8;">Location: ${job.location}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: #4ecdc4;">Cover Letter Message:</label>
+                        <textarea id="coverMessage" placeholder="Write a brief message explaining why you're interested in this position..." style="width: 100%; height: 100px; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #2a2a3e; color: white; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="submitApplication(${index})" style="background: #00d4ff; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold;">📧 Submit Application</button>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: #666; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        function saveJob(index) {
+            if (!currentJobResults[index]) {
+                showNotification('Job information not available', 'error');
+                return;
+            }
+            
+            const job = currentJobResults[index];
+            
+            // Get saved jobs from localStorage
+            let savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            
+            // Check if job is already saved
+            const isAlreadySaved = savedJobs.some(savedJob => 
+                savedJob.title === job.title && savedJob.company === job.company
+            );
+            
+            if (isAlreadySaved) {
+                showNotification('Job already saved to your favorites!', 'info');
+                return;
+            }
+            
+            // Add job to saved jobs
+            savedJobs.push({
+                ...job,
+                savedDate: new Date().toLocaleDateString(),
+                id: Date.now()
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            
+            showNotification(`${job.title} at ${job.company} saved to your favorites!`, 'success');
+        }
+
+        function copyJobLink(index) {
+            if (!currentJobResults[index]) {
+                showNotification('Job information not available', 'error');
+                return;
+            }
+            
+            const job = currentJobResults[index];
+            const jobLink = `${window.location.origin}${window.location.pathname}?job=${encodeURIComponent(job.title)}&company=${encodeURIComponent(job.company)}`;
+            
+            navigator.clipboard.writeText(jobLink).then(() => {
+                showNotification('Job link copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Could not copy link', 'error');
+            });
+        }
+
+        function submitApplication(index) {
+            const job = currentJobResults[index];
+            const coverMessage = document.getElementById('coverMessage').value.trim();
+            
+            if (!coverMessage) {
+                showNotification('Please write a cover message', 'error');
+                return;
+            }
+            
+            // Simulate application submission
+            showNotification('Application submitted successfully!', 'success');
+            
+            // Close modal
+            document.querySelector('.modal-overlay').remove();
+            
+            // Add to applied jobs in localStorage
+            let appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+            appliedJobs.push({
+                ...job,
+                appliedDate: new Date().toLocaleDateString(),
+                coverMessage: coverMessage,
+                id: Date.now()
+            });
+            localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+        }
+
+        // Function to view saved jobs
+        function viewSavedJobs() {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            
+            if (savedJobs.length === 0) {
+                showNotification('No saved jobs found', 'info');
+                return;
+            }
+            
+            // Create modal for saved jobs
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 10000; display: flex; 
+                align-items: center; justify-content: center; padding: 20px;
+            `;
+            
+            const jobsHTML = savedJobs.map((job, index) => `
+                <div style="background: #2a2a3e; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 4px solid #4ecdc4;">
+                    <h4 style="color: #00d4ff; margin: 0 0 5px 0;">${job.title}</h4>
+                    <p style="color: #ff6b6b; margin: 0 0 5px 0;">${job.company}</p>
+                    <p style="color: #b8b8b8; font-size: 0.9em; margin: 0 0 10px 0;">📍 ${job.location} | 💰 ${job.salary || 'Competitive'}</p>
+                    <p style="color: #b8b8b8; font-size: 0.8em;">Saved on: ${job.savedDate}</p>
+                    <div style="margin-top: 10px;">
+                        <button onclick="removeSavedJob(${job.id})" style="background: #ff6b6b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em;">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a2e; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00d4ff; margin: 0;">💾 Saved Jobs (${savedJobs.length})</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+                    </div>
+                    <div>${jobsHTML}</div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        // Function to view applied jobs
+        function viewAppliedJobs() {
+            const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+            
+            if (appliedJobs.length === 0) {
+                showNotification('No job applications found', 'info');
+                return;
+            }
+            
+            // Create modal for applied jobs
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 10000; display: flex; 
+                align-items: center; justify-content: center; padding: 20px;
+            `;
+            
+            const jobsHTML = appliedJobs.map((job, index) => `
+                <div style="background: #2a2a3e; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 4px solid #00d4ff;">
+                    <h4 style="color: #00d4ff; margin: 0 0 5px 0;">${job.title}</h4>
+                    <p style="color: #ff6b6b; margin: 0 0 5px 0;">${job.company}</p>
+                    <p style="color: #b8b8b8; font-size: 0.9em; margin: 0 0 10px 0;">📍 ${job.location} | 💰 ${job.salary || 'Competitive'}</p>
+                    <p style="color: #4ecdc4; font-size: 0.9em; margin: 0 0 5px 0;">Cover Message: "${job.coverMessage}"</p>
+                    <p style="color: #b8b8b8; font-size: 0.8em;">Applied on: ${job.appliedDate}</p>
+                </div>
+            `).join('');
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a2e; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00d4ff; margin: 0;">📝 Applied Jobs (${appliedJobs.length})</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+                    </div>
+                    <div>${jobsHTML}</div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        // Function to remove saved job
+        function removeSavedJob(jobId) {
+            let savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            savedJobs = savedJobs.filter(job => job.id !== jobId);
+            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            
+            showNotification('Job removed from saved list', 'success');
+            
+            // Close and reopen the modal to refresh
+            document.querySelector('.modal-overlay').remove();
+            setTimeout(() => viewSavedJobs(), 100);
+        }
+
+        // Fallback HTML download function
+        function downloadAsHTML(content, filename, title) {
+            if (!content) {
+                showNotification('No content to download', 'error');
+                return;
+            }
+            
+            // Create HTML document
+            const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .content {
+            white-space: pre-wrap;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        @media print {
+            body { margin: 20px; }
+            .header { background: #2c3e50 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>${title}</h1>
+        <p>Generated on ${new Date().toLocaleDateString()}</p>
+    </div>
+    <div class="content">${content}</div>
+</body>
+</html>`;
+            
+            // Create and download the HTML file
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filename}.html`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification(`${title} downloaded as HTML!`, 'success');
+        }
+
+        // Client-side Word document generation fallback
+        async function generateWordDocumentClientSide(content, title) {
+            try {
+                // Check if docx library is available
+                if (typeof window.docx !== 'undefined') {
+                    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+                    
+                    const doc = new Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new Paragraph({
+                                    text: title || 'Document',
+                                    heading: HeadingLevel.HEADING_1
+                                }),
+                                new Paragraph({
+                                    text: content || 'No content available'
+                                })
+                            ]
+                        }]
+                    });
+
+                    const buffer = await Packer.toBuffer(doc);
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${title || 'Document'}.docx`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    showNotification(`${title} downloaded as Word document!`, 'success');
+                    return true;
+                } else {
+                    throw new Error('Word generation library not available');
+                }
+            } catch (error) {
+                console.error('Client-side Word generation failed:', error);
+                return false;
+            }
+        }
+
+        // Client-side PDF generation fallback
+        async function generatePDFDocumentClientSide(content, title) {
+            try {
+                // Check if jsPDF library is available
+                if (typeof window.jsPDF !== 'undefined') {
+                    const { jsPDF } = window.jsPDF;
+                    const doc = new jsPDF();
+                    
+                    // Add title
+                    doc.setFontSize(20);
+                    doc.text(title || 'Document', 20, 20);
+                    
+                    // Add content with proper line breaks
+                    doc.setFontSize(12);
+                    const lines = doc.splitTextToSize(content, 170);
+                    doc.text(lines, 20, 40);
+                    
+                    doc.save(`${title || 'Document'}.pdf`);
+                    showNotification(`${title} downloaded as PDF!`, 'success');
+                    return true;
+                } else {
+                    throw new Error('PDF generation library not available');
+                }
+            } catch (error) {
+                console.error('Client-side PDF generation failed:', error);
+                return false;
+            }
+        }
+
+        // Download interview report
+        async function downloadInterviewReport() {
+            const feedback = document.getElementById('interviewFeedback').innerText;
+            if (!feedback) {
+                showNotification('No interview feedback to download', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/download-word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: feedback,
+                        title: 'Interview_Report'
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Interview_Report.docx';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    showNotification('Download failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Download failed: ' + error.message, 'error');
+            }
+        }
+
+        // Plan selection function
+        function selectPlan(planType) {
+            if (planType === 'free') {
+                showNotification('You are currently on the Free plan', 'info');
+                return;
+            }
+            
+            // In a real application, this would redirect to payment processing
+            showNotification(`Redirecting to ${planType} plan upgrade...`, 'info');
+            
+            // Simulate payment redirect
+            setTimeout(() => {
+                showNotification(`Upgrade to ${planType} plan successful!`, 'success');
+            }, 2000);
+        }
+
+        // Authentication Functions
+        // Check authentication status
+        async function checkAuthStatus() {
+            if (userToken) {
+                try {
+                    const response = await fetch('/api/user-profile', {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        userProfile = await response.json();
+                        currentUser = userProfile;
+                        updateUIForAuthenticatedUser();
+                        loadUserAnalytics();
+                    } else {
+                        // Token expired or invalid
+                        localStorage.removeItem('userToken');
+                        userToken = null;
+                        showLoginModal();
+                    }
+                } catch (error) {
+                    console.error('Auth check error:', error);
+                    showLoginModal();
+                }
+            } else {
+                showLoginModal();
+            }
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 10000; display: flex; 
+                align-items: center; justify-content: center; padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #1a1a2e; padding: 30px; border-radius: 15px; max-width: 400px; width: 100%; color: white;">
+                    <h2 style="color: #00d4ff; margin-bottom: 20px; text-align: center;">Welcome to Ron's AI Career Coach</h2>
+                    <p style="text-align: center; margin-bottom: 20px; color: #b8b8b8;">Start your 7-day free trial to access all features</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" id="loginName" placeholder="Full Name" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a3e; color: white; margin-bottom: 10px;">
+                        <input type="email" id="loginEmail" placeholder="Email Address" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a3e; color: white; margin-bottom: 10px;">
+                        <input type="password" id="loginPassword" placeholder="Password" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a3e; color: white;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="handleLogin()" style="flex: 1; background: #00d4ff; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold;">Login</button>
+                        <button onclick="handleRegister()" style="flex: 1; background: #4ecdc4; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold;">Register</button>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 15px; font-size: 0.9em; color: #888;">
+                        By continuing, you agree to our Terms of Service and Privacy Policy
+                    </p>
+                </div>
+            `;
+            
+            modal.className = 'auth-modal';
+            document.body.appendChild(modal);
+        }
+
+        // Handle user login
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showNotification('Please enter both email and password', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    userToken = result.token;
+                    localStorage.setItem('userToken', userToken);
+                    currentUser = result.user;
+                    document.querySelector('.auth-modal').remove();
+                    showNotification('Login successful!', 'success');
+                    updateUIForAuthenticatedUser();
+                    loadUserAnalytics();
+                } else {
+                    showNotification(result.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Login failed. Please try again.', 'error');
+            }
+        }
+
+        // Handle user registration
+        async function handleRegister() {
+            const name = document.getElementById('loginName').value;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!name || !email || !password) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    userToken = result.token;
+                    localStorage.setItem('userToken', userToken);
+                    currentUser = result.user;
+                    document.querySelector('.auth-modal').remove();
+                    showNotification('Registration successful! Welcome to your 7-day free trial!', 'success');
+                    updateUIForAuthenticatedUser();
+                    loadUserAnalytics();
+                } else {
+                    showNotification(result.error || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showNotification('Registration failed. Please try again.', 'error');
+            }
+        }
+
+        // Update UI for authenticated user
+        function updateUIForAuthenticatedUser() {
+            if (currentUser) {
+                // Show user info in header
+                const header = document.querySelector('.header');
+                if (header) {
+                    const userInfo = document.createElement('div');
+                    userInfo.style.cssText = 'position: absolute; top: 10px; right: 20px; color: white; font-size: 0.9em;';
+                    userInfo.innerHTML = `
+                        <span>Welcome, ${currentUser.name}</span>
+                        <button onclick="logout()" style="margin-left: 10px; background: #ff6b6b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em;">Logout</button>
+                    `;
+                    header.appendChild(userInfo);
+                }
+                
+                // Update trial status if on free plan
+                if (userProfile && userProfile.subscription && userProfile.subscription.plan === 'free') {
+                    showTrialStatus();
+                }
+            }
+        }
+
+        // Show trial status
+        function showTrialStatus() {
+            const trialBanner = document.getElementById('trialStatus');
+            if (trialBanner && userProfile) {
+                const daysRemaining = userProfile.analytics.daysRemaining || 7;
+                const progressPercent = ((7 - daysRemaining) / 7) * 100;
+                
+                document.getElementById('daysRemaining').textContent = daysRemaining;
+                document.getElementById('trialProgressFill').style.width = `${progressPercent}%`;
+                trialBanner.style.display = 'block';
+            }
+        }
+
+        // Load user analytics
+        async function loadUserAnalytics() {
+            if (!userToken) return;
+            
+            try {
+                const response = await fetch('/api/user-analytics', {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                
+                if (response.ok) {
+                    const analytics = await response.json();
+                    updateUsageStats(analytics);
+                }
+            } catch (error) {
+                console.error('Analytics load error:', error);
+            }
+        }
+
+        // Update usage statistics
+        function updateUsageStats(analytics) {
+            if (analytics.usage) {
+                const usage = analytics.usage;
+                const plan = userProfile.subscription.plan;
+                const limits = getPlanLimits(plan);
+                
+                // Update chat usage
+                if (limits.chat !== -1) {
+                    const chatPercent = (usage.chat / limits.chat) * 100;
+                    document.getElementById('chatUsage').style.width = `${chatPercent}%`;
+                    document.getElementById('chatUsageText').textContent = `${usage.chat}/${limits.chat} used`;
+                }
+                
+                // Update interview usage
+                if (limits.interviewPrep !== -1) {
+                    const interviewPercent = (usage.interviewPrep / limits.interviewPrep) * 100;
+                    document.getElementById('interviewUsage').style.width = `${interviewPercent}%`;
+                    document.getElementById('interviewUsageText').textContent = `${usage.interviewPrep}/${limits.interviewPrep} used`;
+                }
+                
+                // Update career planning usage
+                if (limits.careerPlanning !== -1) {
+                    const careerPercent = (usage.careerPlanning / limits.careerPlanning) * 100;
+                    document.getElementById('careerUsage').style.width = `${careerPercent}%`;
+                    document.getElementById('careerUsageText').textContent = `${usage.careerPlanning}/${limits.careerPlanning} used`;
+                }
+            }
+        }
+
+        // Get plan limits
+        function getPlanLimits(plan) {
+            const limits = {
+                free: { chat: 10, interviewPrep: 5, careerPlanning: 3 },
+                starter: { chat: 50, interviewPrep: 20, careerPlanning: 10 },
+                professional: { chat: -1, interviewPrep: -1, careerPlanning: -1 }
+            };
+            return limits[plan] || limits.free;
+        }
+
+        // Handle plan upgrade
+        async function upgradePlan(planName) {
+            if (!userToken) {
+                showNotification('Please login to upgrade your plan', 'error');
+                return;
+            }
+            
+            const plan = getPlanDetails(planName);
+            const confirmed = confirm(`Upgrade to ${plan.name} for ${plan.price}?`);
+            
+            if (confirmed) {
+                try {
+                    const response = await fetch('/api/process-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: currentUser.id,
+                            planName: planName,
+                            paymentMethod: 'stripe'
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification(`Successfully upgraded to ${plan.name}!`, 'success');
+                        checkAuthStatus(); // Refresh user data
+                    } else {
+                        showNotification(result.message || 'Upgrade failed', 'error');
+                    }
+                } catch (error) {
+                    console.error('Upgrade error:', error);
+                    showNotification('Upgrade failed. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Get plan details
+        function getPlanDetails(planName) {
+            const plans = {
+                free: { name: 'Free Trial', price: '$0' },
+                starter: { name: 'Starter Plan', price: '$9.99/month' },
+                professional: { name: 'Professional Plan', price: '$19.99/month' }
+            };
+            return plans[planName] || plans.free;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('userToken');
+            userToken = null;
+            currentUser = null;
+            userProfile = null;
+            location.reload();
+        }
+
+        // Initialize market insights when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMotivationalMessage();
+            initializeVoiceRecognition();
+            loadMarketInsights();
+        });
+    </script>
+</body>
+</html>

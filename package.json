@@ -10,10 +10,12 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "docx": "^8.5.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "mammoth": "^1.6.0",
     "multer": "^1.4.5-lts.1",
     "pdf-parse": "^1.1.1",
