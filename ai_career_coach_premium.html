@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ron's AI Career Coach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg-primary: #0a0f1c;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-secondary: #475569;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-primary) !important;
+            border-right: 3px solid var(--primary);
+            z-index: 1000;
+        }
+        
+        .nav-header {
+            padding: 2rem;
+            background: var(--bg-tertiary) !important;
+            border-bottom: 2px solid var(--primary);
+            text-align: center;
+        }
+        
+        .nav-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-menu {
+            padding: 1rem 0;
+            background: var(--bg-primary) !important;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: var(--text-secondary) !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            margin: 0.25rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-tertiary) !important;
+        }
+        
+        .nav-item:hover {
+            background: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border-left-color: var(--primary);
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: var(--primary) !important;
+            color: var(--text-primary) !important;
+            border-left-color: var(--text-primary);
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid var(--border-secondary);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-secondary);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-header">
+            <div class="nav-logo">🚀 Ron's AI Career Coach</div>
+        </div>
+        <div class="nav-menu">
+            <a href="#ai-chat" class="nav-item active" onclick="showSection('ai-chat')">💬 AI Chat</a>
+            <a href="#resume-analysis" class="nav-item" onclick="showSection('resume-analysis')">📄 Resume Analysis</a>
+            <a href="#cover-letter-resume" class="nav-item" onclick="showSection('cover-letter-resume')">✉️ Cover Letter & Resume</a>
+            <a href="#interview-prep" class="nav-item" onclick="showSection('interview-prep')">🎯 Interview Prep</a>
+            <a href="#job-search" class="nav-item" onclick="showSection('job-search')">🔍 Job Search</a>
+            <a href="#payment-plans" class="nav-item" onclick="showSection('payment-plans')">💳 Payment Plans</a>
+            <a href="#career-planning" class="nav-item" onclick="showSection('career-planning')">🎯 Career Planning</a>
+            <a href="#my-insights" class="nav-item" onclick="showSection('my-insights')">💡 My Insights</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section id="ai-chat">
+            <div class="card">
+                <h2>🤖 AI Career Coach Chat</h2>
+                <p>Ask me anything about your career, resume, interviews, or job search!</p>
+                <div id="chatMessages">
+                    <p>👋 Hello! I'm your AI Career Coach. How can I help you today?</p>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <input type="text" id="chatInput" class="form-input" placeholder="Type your message here...">
+                    <button class="btn btn-primary" onclick="sendMessage()" style="margin-left: 0.5rem;">Send</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="resume-analysis" class="hidden">
+            <div class="card">
+                <h2>📊 Resume Analysis</h2>
+                <p>Upload your resume for comprehensive ATS scoring and optimization</p>
+                <div class="form-group">
+                    <input type="file" id="resumeFile" accept=".pdf,.docx,.doc" class="form-input">
+                </div>
+                <button class="btn btn-primary" onclick="analyzeResume()">Analyze Resume</button>
+                <div id="analysisResults" class="hidden">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="cover-letter-resume" class="hidden">
+            <div class="card">
+                <h2>✉️ Cover Letter & Resume Generation</h2>
+                <div class="form-group">
+                    <label class="form-label">Target Role</label>
+                    <input type="text" class="form-input" id="targetRole" placeholder="e.g., Senior Software Engineer">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" class="form-input" id="companyName" placeholder="e.g., Google, Microsoft">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Description</label>
+                    <textarea class="form-textarea" id="jobDescription" placeholder="Paste the complete job description here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your Current Resume</label>
+                    <input type="file" id="currentResumeFile" accept=".pdf,.docx,.doc" class="form-input">
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="generateOptimizedResume()">Generate Optimized Resume</button>
+                    <button class="btn btn-primary" onclick="generateCoverLetter()" style="margin-left: 0.5rem;">Generate Cover Letter</button>
+                </div>
+                <div id="generatedDocuments" class="hidden">
+                    <!-- Generated documents will appear here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="interview-prep" class="hidden">
+            <div class="card">
+                <h2>🎯 Interview Preparation</h2>
+                <div class="form-group">
+                    <label class="form-label">Target Job Title *</label>
+                    <input type="text" id="interviewJobTitle" class="form-input" placeholder="e.g., Senior Software Engineer" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    <input type="text" id="interviewCompany" class="form-input" placeholder="e.g., Google, Microsoft" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Description *</label>
+                    <textarea id="interviewJobDescription" class="form-textarea" rows="8" placeholder="Paste the complete job description here. This is required to generate personalized interview questions and preparation strategies." required></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="generateInterviewPrep()">Generate Interview Prep</button>
+                <div id="interviewPrepResults" class="hidden">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="job-search" class="hidden">
+            <div class="card">
+                <h2>🔍 Job Search</h2>
+                <div class="form-group">
+                    <label class="form-label">Job Title</label>
+                    <input type="text" id="jobTitle" class="form-input" placeholder="e.g., Software Engineer">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" id="location" class="form-input" placeholder="e.g., San Francisco, CA">
+                </div>
+                <button class="btn btn-primary" onclick="searchJobs()">Search Jobs</button>
+                <div id="jobList" class="hidden">
+                    <!-- Job listings will appear here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="payment-plans" class="hidden">
+            <div class="card">
+                <h2>💳 Payment Plans</h2>
+                <p>Choose the perfect plan for your career development journey</p>
+                <!-- Payment plan content will go here -->
+            </div>
+        </section>
+
+        <section id="career-planning" class="hidden">
+            <div class="card">
+                <h2>🎯 Career Development</h2>
+                <p>Create personalized career roadmaps and development plans</p>
+                <!-- Career planning content will go here -->
+            </div>
+        </section>
+
+        <section id="my-insights" class="hidden">
+            <div class="card">
+                <h2>💡 My Insights Dashboard</h2>
+                <p>Track your progress and get personalized career insights</p>
+                <!-- Insights content will go here -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateResponse(message);
+                addMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.marginBottom = '1rem';
+            messageDiv.style.padding = '1rem';
+            messageDiv.style.borderRadius = '8px';
+            messageDiv.style.maxWidth = '80%';
+            
+            if (sender === 'user') {
+                messageDiv.style.background = 'var(--primary)';
+                messageDiv.style.color = 'white';
+                messageDiv.style.marginLeft = 'auto';
+            } else {
+                messageDiv.style.background = 'var(--bg-tertiary)';
+                messageDiv.style.border = '1px solid var(--border-secondary)';
+            }
+            
+            messageDiv.innerHTML = `<p>${text}</p>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('resume')) {
+                return "I'd be happy to help with your resume! I can analyze it for ATS optimization, suggest improvements, and help you tailor it for specific job descriptions. Would you like to upload your resume for analysis?";
+            } else if (message.includes('interview')) {
+                return "Great question! I can help you prepare for interviews with practice questions, feedback on your responses, and tips for different interview types. What kind of interview are you preparing for?";
+            } else if (message.includes('job search')) {
+                return "I can help you with job search strategies, finding relevant opportunities, and optimizing your applications. What industry or role are you targeting?";
+            } else {
+                return "I'm here to help with your career development! I can assist with resume optimization, interview preparation, job search strategies, and career planning. What would you like to focus on?";
+            }
+        }
+
+        function analyzeResume() {
+            const fileInput = document.getElementById('resumeFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please upload a resume first');
+                return;
+            }
+            
+            // Simulate analysis
+            setTimeout(() => {
+                const results = document.getElementById('analysisResults');
+                results.classList.remove('hidden');
+                results.innerHTML = `
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                        <h3>Resume Analysis Results</h3>
+                        <p><strong>Job Match Score:</strong> 85%</p>
+                        <p><strong>ATS Score:</strong> 78%</p>
+                        <p><strong>Overall Score:</strong> 82%</p>
+                        <p><strong>Recommendations:</strong></p>
+                        <ul>
+                            <li>Add more specific technical skills</li>
+                            <li>Include quantifiable achievements</li>
+                            <li>Optimize for ATS compatibility</li>
+                        </ul>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function generateOptimizedResume() {
+            const targetRole = document.getElementById('targetRole').value;
+            const companyName = document.getElementById('companyName').value;
+            const jobDescription = document.getElementById('jobDescription').value;
+            const currentResumeFile = document.getElementById('currentResumeFile').files[0];
+            
+            if (!targetRole || !companyName || !jobDescription || !currentResumeFile) {
+                alert('Please fill in all fields and upload your current resume');
+                return;
+            }
+            
+            // Simulate generation
+            setTimeout(() => {
+                const documents = document.getElementById('generatedDocuments');
+                documents.classList.remove('hidden');
+                documents.innerHTML = `
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                        <h3>Generated Documents</h3>
+                        <p><strong>Optimized Resume:</strong> Ready for download</p>
+                        <p><strong>Cover Letter:</strong> Ready for download</p>
+                        <button class="btn btn-primary" onclick="downloadResume()">Download Resume</button>
+                        <button class="btn btn-primary" onclick="downloadCoverLetter()" style="margin-left: 0.5rem;">Download Cover Letter</button>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function generateCoverLetter() {
+            const targetRole = document.getElementById('targetRole').value;
+            const companyName = document.getElementById('companyName').value;
+            const jobDescription = document.getElementById('jobDescription').value;
+            
+            if (!targetRole || !companyName || !jobDescription) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Simulate generation
+            setTimeout(() => {
+                const documents = document.getElementById('generatedDocuments');
+                documents.classList.remove('hidden');
+                documents.innerHTML = `
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                        <h3>Generated Cover Letter</h3>
+                        <p>Your personalized cover letter is ready!</p>
+                        <button class="btn btn-primary" onclick="downloadCoverLetter()">Download Cover Letter</button>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function generateInterviewPrep() {
+            const jobTitle = document.getElementById('interviewJobTitle').value;
+            const company = document.getElementById('interviewCompany').value;
+            const jobDescription = document.getElementById('interviewJobDescription').value;
+            
+            if (!jobTitle || !company || !jobDescription) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Simulate generation
+            setTimeout(() => {
+                const results = document.getElementById('interviewPrepResults');
+                results.classList.remove('hidden');
+                results.innerHTML = `
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                        <h3>Interview Preparation for ${jobTitle} at ${company}</h3>
+                        <p><strong>Key Skills to Highlight:</strong></p>
+                        <ul>
+                            <li>Technical expertise</li>
+                            <li>Problem-solving abilities</li>
+                            <li>Team collaboration</li>
+                        </ul>
+                        <p><strong>Common Questions:</strong></p>
+                        <ul>
+                            <li>Tell me about yourself</li>
+                            <li>Why do you want to work here?</li>
+                            <li>What are your strengths and weaknesses?</li>
+                        </ul>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function searchJobs() {
+            const jobTitle = document.getElementById('jobTitle').value;
+            const location = document.getElementById('location').value;
+            
+            if (!jobTitle || !location) {
+                alert('Please enter both job title and location');
+                return;
+            }
+            
+            // Simulate job search
+            setTimeout(() => {
+                const jobList = document.getElementById('jobList');
+                jobList.classList.remove('hidden');
+                jobList.innerHTML = `
+                    <div style="margin-top: 1rem;">
+                        <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 1rem;">
+                            <h3>Senior Software Engineer</h3>
+                            <p><strong>Company:</strong> Tech Corp</p>
+                            <p><strong>Location:</strong> ${location}</p>
+                            <p><strong>Salary:</strong> $120,000 - $180,000</p>
+                            <button class="btn btn-primary">Apply Now</button>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                            <h3>Full Stack Developer</h3>
+                            <p><strong>Company:</strong> Startup Inc</p>
+                            <p><strong>Location:</strong> ${location}</p>
+                            <p><strong>Salary:</strong> $90,000 - $140,000</p>
+                            <button class="btn btn-primary">Apply Now</button>
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function downloadResume() {
+            alert('Resume download started!');
+        }
+
+        function downloadCoverLetter() {
+            alert('Cover letter download started!');
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('ai-chat');
+        });
+    </script>
+</body>
+</html>
+
