@@ -21,10 +21,9 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^7.0.5",
     "pdf-parse": "^1.1.1",
-    "puppeteer": "^21.5.2",
     "sqlite3": "^5.1.7",
-    "uuid": "^9.0.1",
-    "user-agents": "^1.0.1344"
+    "user-agents": "^1.0.1344",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
