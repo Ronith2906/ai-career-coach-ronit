@@ -1364,12 +1364,16 @@ const userContext = new Map();
 // Simple in-memory user store (email -> user)
 // { id, name, email, passwordHash, registrationDate, lastLogin, trialEndDate, subscriptionStatus }
 const usersByEmail = new Map();
+const users = new Map(); // User ID -> user mapping
 
 // User data collection and analytics
 const userAnalytics = new Map();
 const userSessions = new Map();
 const featureUsage = new Map();
 const paymentHistory = new Map();
+
+// Password reset tokens
+const passwordResetTokens = new Map();
 
 // Enhanced analytics tracking for Phase 1
 const userBehavior = new Map(); // Track detailed user behavior patterns
@@ -2423,7 +2427,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
     
-    // Auth: Register
+    // Auth: Register (legacy endpoint)
     if (pathname === '/api/register' && req.method === 'POST') {
     let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
@@ -2447,6 +2451,173 @@ const server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({ message: 'Registered successfully' }));
         } catch (error) {
                 console.error('Register error:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal server error' }));
+            }
+        });
+        return;
+    }
+
+    // Auth: Login
+    if (pathname === '/api/auth/login' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+            try {
+                const { email, password } = JSON.parse(body);
+                if (!email || !password) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email and password are required' }));
+                    return;
+                }
+
+                const user = usersByEmail.get(email);
+                if (!user || !user.passwordHash) {
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid email or password' }));
+                    return;
+                }
+
+                const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+                if (!isValidPassword) {
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid email or password' }));
+                    return;
+                }
+
+                // Generate JWT token
+                const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ 
+                    message: 'Login successful',
+                    token: token,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email
+                    }
+                }));
+            } catch (error) {
+                console.error('Login error:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal server error' }));
+            }
+        });
+        return;
+    }
+
+    // Auth: Register
+    if (pathname === '/api/auth/register' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+            try {
+                const { name, email, password } = JSON.parse(body);
+                if (!name || !email || !password) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Name, email, and password are required' }));
+                    return;
+                }
+
+                if (password.length < 8) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Password must be at least 8 characters long' }));
+                    return;
+                }
+
+                if (usersByEmail.has(email)) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email already registered' }));
+                    return;
+                }
+
+                const passwordHash = await bcrypt.hash(password, 10);
+                const userId = uuidv4();
+                const user = { 
+                    id: userId, 
+                    name, 
+                    email, 
+                    passwordHash,
+                    createdAt: new Date()
+                };
+                
+                usersByEmail.set(email, user);
+                users.set(userId, user);
+
+                // Create subscription for new user
+                userSubscriptions.set(userId, {
+                    plan: 'free',
+                    startDate: new Date(),
+                    usage: { chat: 0, resumeAnalysis: 0, interviewPrep: 0, careerPlanning: 0, coverLetter: 0 }
+                });
+
+                // Generate JWT token
+                const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ 
+                    message: 'Account created successfully',
+                    token: token,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email
+                    }
+                }));
+            } catch (error) {
+                console.error('Register error:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal server error' }));
+            }
+        });
+        return;
+    }
+
+    // Auth: Forgot Password
+    if (pathname === '/api/auth/forgot-password' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+            try {
+                const { email } = JSON.parse(body);
+                if (!email) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email is required' }));
+                    return;
+                }
+
+                const user = usersByEmail.get(email);
+                if (!user) {
+                    // Don't reveal if email exists or not for security
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'If the email exists, a reset link has been sent' }));
+                    return;
+                }
+
+                // Generate reset token
+                const resetToken = uuidv4();
+                const resetExpiry = new Date(Date.now() + 3600000); // 1 hour
+
+                // Store reset token (in a real app, you'd use a database)
+                passwordResetTokens.set(resetToken, {
+                    userId: user.id,
+                    email: user.email,
+                    expires: resetExpiry
+                });
+
+                // Send reset email
+                const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
+                
+                if (emailSent) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'Password reset link sent to your email' }));
+                } else {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Failed to send reset email. Please try again.' }));
+                }
+            } catch (error) {
+                console.error('Forgot password error:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Internal server error' }));
             }
