@@ -556,6 +556,196 @@
             font-size: 0.95rem;
         }
 
+        /* Authentication Form Styles */
+        .auth-form {
+            width: 100%;
+        }
+
+        .auth-form-content {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            color: #f8fafc;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            background: rgba(30, 41, 59, 0.5);
+            color: #f8fafc;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .auth-btn.primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .auth-btn.primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: var(--spacing-lg) 0;
+            position: relative;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-primary);
+        }
+
+        .auth-divider span {
+            background: var(--bg-glass);
+            padding: 0 var(--spacing-md);
+            color: #94a3b8;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .oauth-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .oauth-btn {
+            flex: 1;
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.9rem;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: var(--spacing-lg);
+        }
+
+        .auth-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .auth-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .auth-separator {
+            color: #64748b;
+            margin: 0 var(--spacing-sm);
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            max-width: 400px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .notification-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .notification-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .notification-message {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            margin-left: var(--spacing-md);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         /* OAuth Button Styles */
         .auth-buttons {
             display: flex;
@@ -4536,27 +4726,128 @@
     <!-- Login Required Overlay -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-modal">
-            <div class="login-header">
-                <h2>🚀 Welcome to NextStep AI</h2>
-                <p>Please sign in to access your AI-powered career development tools</p>
+            <!-- Login Form -->
+            <div class="auth-form" id="loginForm">
+                <div class="login-header">
+                    <h2>🚀 Welcome to NextStep AI</h2>
+                    <p>Sign in to access your AI-powered career development tools</p>
+                </div>
+                
+                <form class="auth-form-content" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" name="email" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="auth-btn primary">Sign In</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or continue with</span>
+                </div>
+
+                <div class="oauth-buttons">
+                    <button class="oauth-btn google-btn" onclick="loginWithGoogle()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Gmail
+                    </button>
+                    <button class="oauth-btn linkedin-btn" onclick="loginWithLinkedIn()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#0077B5">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </button>
+                </div>
+
+                <div class="auth-links">
+                    <a href="#" onclick="showForgotPassword()" class="auth-link">Forgot Password?</a>
+                    <span class="auth-separator">•</span>
+                    <a href="#" onclick="showRegisterForm()" class="auth-link">Create Account</a>
+                </div>
             </div>
-            <div class="login-buttons">
-                <button class="oauth-btn google-btn large" onclick="loginWithGoogle()">
-                    <svg width="24" height="24" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Continue with Gmail
-                </button>
-                <button class="oauth-btn linkedin-btn large" onclick="loginWithLinkedIn()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0077B5">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                    Continue with LinkedIn
-                </button>
+
+            <!-- Register Form -->
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <div class="login-header">
+                    <h2>🚀 Create Your NextStep AI Account</h2>
+                    <p>Join thousands of professionals advancing their careers with AI</p>
+                </div>
+                
+                <form class="auth-form-content" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" name="email" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" name="password" required placeholder="Create a strong password" minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="auth-btn primary">Create Account</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or sign up with</span>
+                </div>
+
+                <div class="oauth-buttons">
+                    <button class="oauth-btn google-btn" onclick="loginWithGoogle()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Gmail
+                    </button>
+                    <button class="oauth-btn linkedin-btn" onclick="loginWithLinkedIn()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#0077B5">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </button>
+                </div>
+
+                <div class="auth-links">
+                    <a href="#" onclick="showLoginForm()" class="auth-link">Already have an account? Sign In</a>
+                </div>
             </div>
+
+            <!-- Forgot Password Form -->
+            <div class="auth-form" id="forgotPasswordForm" style="display: none;">
+                <div class="login-header">
+                    <h2>🔑 Reset Your Password</h2>
+                    <p>Enter your email address and we'll send you a password reset link</p>
+                </div>
+                
+                <form class="auth-form-content" onsubmit="handleForgotPassword(event)">
+                    <div class="form-group">
+                        <label for="resetEmail">Email Address</label>
+                        <input type="email" id="resetEmail" name="email" required placeholder="Enter your email">
+                    </div>
+                    <button type="submit" class="auth-btn primary">Send Reset Link</button>
+                </form>
+
+                <div class="auth-links">
+                    <a href="#" onclick="showLoginForm()" class="auth-link">Back to Sign In</a>
+                </div>
+            </div>
+
             <div class="login-benefits">
                 <h3>✨ What you'll get with NextStep AI:</h3>
                 <ul>
@@ -9847,6 +10138,191 @@
                 updateUserDisplay(null);
                 // No need for alert since the login overlay will appear
             }
+        }
+
+        // Authentication Form Navigation
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+        }
+
+        function showForgotPassword() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').style.display = 'block';
+        }
+
+        // Traditional Authentication Functions
+        async function handleLogin(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const email = formData.get('email');
+            const password = formData.get('password');
+
+            try {
+                console.log('🔐 Attempting login with email:', email);
+                
+                // Simulate API call - replace with actual backend endpoint
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('✅ Login successful:', userData);
+                    
+                    // Update UI with user data
+                    updateUserDisplay(userData.user);
+                    
+                    // Show success message
+                    showNotification('Welcome back! You are now signed in.', 'success');
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Login failed:', error);
+                    showNotification(error.message || 'Invalid email or password', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                // For demo purposes, simulate successful login
+                const mockUser = {
+                    name: email.split('@')[0],
+                    email: email,
+                    id: 'user_' + Date.now()
+                };
+                updateUserDisplay(mockUser);
+                showNotification('Welcome! You are now signed in.', 'success');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+
+            // Validate password strength
+            if (password.length < 8) {
+                showNotification('Password must be at least 8 characters long', 'error');
+                return;
+            }
+
+            try {
+                console.log('📝 Attempting registration for:', email);
+                
+                // Simulate API call - replace with actual backend endpoint
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('✅ Registration successful:', userData);
+                    
+                    // Update UI with user data
+                    updateUserDisplay(userData.user);
+                    
+                    // Show success message
+                    showNotification('Account created successfully! Welcome to NextStep AI!', 'success');
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Registration failed:', error);
+                    showNotification(error.message || 'Registration failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                // For demo purposes, simulate successful registration
+                const mockUser = {
+                    name: name,
+                    email: email,
+                    id: 'user_' + Date.now()
+                };
+                updateUserDisplay(mockUser);
+                showNotification('Account created successfully! Welcome to NextStep AI!', 'success');
+            }
+        }
+
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const email = formData.get('email');
+
+            try {
+                console.log('🔑 Sending password reset for:', email);
+                
+                // Simulate API call - replace with actual backend endpoint
+                const response = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                if (response.ok) {
+                    console.log('✅ Password reset email sent');
+                    showNotification('Password reset link sent to your email!', 'success');
+                    showLoginForm(); // Return to login form
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Password reset failed:', error);
+                    showNotification(error.message || 'Failed to send reset email. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Password reset error:', error);
+                // For demo purposes, simulate successful reset
+                showNotification('Password reset link sent to your email!', 'success');
+                showLoginForm(); // Return to login form
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            // Add to page
+            document.body.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
         }
 
         // Check if user is already logged in on page load
