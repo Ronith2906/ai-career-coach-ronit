@@ -2025,6 +2025,37 @@
             background: #4b5563;
         }
 
+        /* Contact Support Styles */
+        .contact-info {
+            margin-top: var(--spacing-xs);
+        }
+
+        .contact-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .contact-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .contact-link::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: var(--spacing-xs);
+        }
+
         .nav {
             display: flex;
             gap: var(--spacing-lg);
@@ -6371,16 +6402,32 @@
                             <div class="settings-section">
                                 <h3>📞 Support & Help</h3>
                                 <div class="setting-item">
-                                    <button onclick="contactSupport()" class="settings-btn">Contact Support</button>
+                                    <label>📧 Email Support:</label>
+                                    <div class="contact-info">
+                                        <a href="mailto:ronith.reagan@gmail.com" class="contact-link">
+                                            ronith.reagan@gmail.com
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="setting-item">
-                                    <button onclick="viewHelpCenter()" class="settings-btn">Help Center</button>
+                                    <label>📱 Phone Support:</label>
+                                    <div class="contact-info">
+                                        <a href="tel:+16283588060" class="contact-link">
+                                            +1 (628) 358-8060
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="setting-item">
-                                    <button onclick="submitFeedback()" class="settings-btn">Submit Feedback</button>
+                                    <button onclick="contactSupport()" class="settings-btn">💬 Contact Support</button>
                                 </div>
                                 <div class="setting-item">
-                                    <button onclick="reportBug()" class="settings-btn">Report a Bug</button>
+                                    <button onclick="viewHelpCenter()" class="settings-btn">📚 Help Center</button>
+                                </div>
+                                <div class="setting-item">
+                                    <button onclick="submitFeedback()" class="settings-btn">💭 Submit Feedback</button>
+                                </div>
+                                <div class="setting-item">
+                                    <button onclick="reportBug()" class="settings-btn">🐛 Report a Bug</button>
                                 </div>
                             </div>
                         </div>
