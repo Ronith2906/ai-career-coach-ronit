@@ -27,6 +27,7 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #1e293b 75%, #0f172a 100%);
             min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Premium Dark Theme with Glassmorphism */
@@ -489,6 +490,8 @@
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
         }
 
         .login-modal {
@@ -499,8 +502,11 @@
             padding: var(--spacing-xl);
             max-width: 500px;
             width: 90%;
+            max-height: 90vh;
             text-align: center;
             box-shadow: var(--shadow-2xl);
+            overflow-y: auto;
+            margin: auto;
         }
 
         .login-header h2 {
@@ -743,6 +749,38 @@
             to {
                 transform: translateX(0);
                 opacity: 1;
+            }
+        }
+
+        /* Mobile responsiveness for login overlay */
+        @media (max-width: 768px) {
+            .login-overlay {
+                padding: var(--spacing-md);
+                align-items: flex-start;
+                padding-top: var(--spacing-xl);
+            }
+
+            .login-modal {
+                max-width: 100%;
+                width: 100%;
+                max-height: calc(100vh - 2rem);
+                margin: 0;
+            }
+
+            .login-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .login-header p {
+                font-size: 1rem;
+            }
+
+            .oauth-buttons {
+                flex-direction: column;
+            }
+
+            .oauth-btn {
+                width: 100%;
             }
         }
 
