@@ -71,7 +71,9 @@ function generateGoogleAuthUrl() {
         redirect_uri: OAUTH_CONFIG.google.redirectUri,
         response_type: 'code',
         scope: 'openid email profile',
-        state: state
+        state: state,
+        access_type: 'offline',
+        prompt: 'consent'
     });
     return `${OAUTH_CONFIG.google.authUrl}?${params.toString()}`;
 }
