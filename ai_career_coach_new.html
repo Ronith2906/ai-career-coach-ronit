@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Ron's AI Career Coach - Your Personal AI-Powered Career Development Assistant</title>
+    <title>🚀 NextStep AI - Your Personal AI-Powered Career Development Assistant</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -474,6 +474,86 @@
         .header-settings-btn:hover {
             background: #f3f4f6;
             color: #374151;
+        }
+
+        /* Login Overlay Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-modal {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .login-header h2 {
+            color: #f8fafc;
+            margin-bottom: var(--spacing-sm);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #94a3b8;
+            margin-bottom: var(--spacing-xl);
+            font-size: 1.1rem;
+        }
+
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .oauth-btn.large {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .login-benefits {
+            text-align: left;
+            background: rgba(30, 41, 59, 0.5);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-primary);
+        }
+
+        .login-benefits h3 {
+            color: #f8fafc;
+            margin-bottom: var(--spacing-md);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .login-benefits ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-benefits li {
+            color: #cbd5e1;
+            padding: var(--spacing-xs) 0;
+            font-size: 0.95rem;
         }
 
         /* OAuth Button Styles */
@@ -1296,8 +1376,11 @@
 
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: var(--spacing-lg);
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .pricing-card {
@@ -1325,6 +1408,26 @@
             font-weight: 700;
             color: #2563eb;
             margin-bottom: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trial-period {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .monthly-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
         }
 
         .pricing-card ul {
@@ -4364,7 +4467,7 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">🚀 Ron's AI Career Coach</div>
+                <div class="logo">🚀 NextStep AI</div>
                 <div class="user-info">
                     <span class="user-name" id="userDisplayName">Welcome, Guest</span>
                     <div class="auth-buttons" id="authButtons">
@@ -4430,8 +4533,46 @@
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
 
+    <!-- Login Required Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-modal">
+            <div class="login-header">
+                <h2>🚀 Welcome to NextStep AI</h2>
+                <p>Please sign in to access your AI-powered career development tools</p>
+            </div>
+            <div class="login-buttons">
+                <button class="oauth-btn google-btn large" onclick="loginWithGoogle()">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Gmail
+                </button>
+                <button class="oauth-btn linkedin-btn large" onclick="loginWithLinkedIn()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0077B5">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                    Continue with LinkedIn
+                </button>
+            </div>
+            <div class="login-benefits">
+                <h3>✨ What you'll get with NextStep AI:</h3>
+                <ul>
+                    <li>🎯 AI-powered career coaching & guidance</li>
+                    <li>📄 Professional resume analysis & optimization</li>
+                    <li>🎤 Video interview practice sessions</li>
+                    <li>📝 Personalized cover letter generation</li>
+                    <li>🔍 Real-time job matching & alerts</li>
+                    <li>📊 Career planning & goal tracking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Area -->
-    <main class="main-content" id="mainContent">
+    <main class="main-content" id="mainContent" style="display: none;">
         <div class="container">
             <div class="content-tabs">
                 <button class="tab-button active" onclick="showTab('ai-chat')">💬 AI Chat</button>
@@ -5675,41 +5816,23 @@
                     
                     <div class="pricing-container">
                         <div class="pricing-grid">
-                            <div class="pricing-card">
-                                <h3>Free</h3>
-                                <div class="price">$0</div>
-                                <ul>
-                                    <li>Basic resume analysis</li>
-                                    <li>5 AI chat messages</li>
-                                    <li>Basic interview prep</li>
-                                </ul>
-                                <button class="pricing-btn">Get Started</button>
-                            </div>
                             <div class="pricing-card featured">
-                                <h3>Pro</h3>
-                                <div class="price">$9.99/month</div>
+                                <h3>NextStep AI Premium</h3>
+                                <div class="price">
+                                    <span class="trial-period">7 Days Free</span>
+                                    <span class="monthly-price">Then $9.99/month</span>
+                                </div>
                                 <ul>
-                                    <li>Advanced resume analysis</li>
-                                    <li>Unlimited AI chat</li>
-                                    <li>Video interview practice</li>
-                                    <li>Cover letter generation</li>
-                                    <li>Job matching</li>
+                                    <li>Advanced resume analysis & ATS optimization</li>
+                                    <li>Unlimited AI career coaching chat</li>
+                                    <li>Video interview practice sessions</li>
+                                    <li>Professional cover letter generation</li>
+                                    <li>Real-time job matching & alerts</li>
+                                    <li>Career planning & goal tracking</li>
                                     <li>Priority support</li>
+                                    <li>Cancel anytime</li>
                                 </ul>
-                                <button class="pricing-btn">Choose Pro</button>
-                            </div>
-                            <div class="pricing-card">
-                                <h3>Enterprise</h3>
-                                <div class="price">$19.99/month</div>
-                                <ul>
-                                    <li>Everything in Pro</li>
-                                    <li>Career coaching sessions</li>
-                                    <li>Premium support</li>
-                                    <li>Custom integrations</li>
-                                    <li>Advanced analytics</li>
-                                    <li>Team collaboration</li>
-                                </ul>
-                                <button class="pricing-btn">Choose Enterprise</button>
+                                <button class="pricing-btn">Start Free Trial</button>
                             </div>
                         </div>
                     </div>
@@ -6572,7 +6695,7 @@
                         <h2 class="section-title">PROJECTS</h2>
                         <div class="experience-item">
                             <div class="job-header">
-                                <h3 class="job-title">Ron's AI Career Coach (2025)</h3>
+                                <h3 class="job-title">NextStep AI (2025)</h3>
                                 <span class="job-company">Full-stack AI Platform</span>
                             </div>
                             <ul class="job-achievements">
@@ -9691,20 +9814,28 @@
             const userDisplayName = document.getElementById('userDisplayName');
             const authButtons = document.getElementById('authButtons');
             const userSettings = document.getElementById('userSettings');
+            const loginOverlay = document.getElementById('loginOverlay');
+            const mainContent = document.getElementById('mainContent');
             
             if (userInfo && userInfo.name) {
+                // User is logged in - hide overlay, show main content
                 userDisplayName.textContent = `Welcome, ${userInfo.name}`;
                 authButtons.style.display = 'none';
                 userSettings.style.display = 'block';
                 document.body.classList.add('user-logged-in');
+                loginOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
                 
                 // Store user info in localStorage
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
             } else {
+                // User is not logged in - show overlay, hide main content
                 userDisplayName.textContent = 'Welcome, Guest';
                 authButtons.style.display = 'flex';
                 userSettings.style.display = 'none';
                 document.body.classList.remove('user-logged-in');
+                loginOverlay.style.display = 'flex';
+                mainContent.style.display = 'none';
                 localStorage.removeItem('userInfo');
             }
         }
@@ -9714,7 +9845,7 @@
             if (confirm) {
                 console.log('🚪 Logging out user...');
                 updateUserDisplay(null);
-                alert('Logged out successfully!');
+                // No need for alert since the login overlay will appear
             }
         }
 
